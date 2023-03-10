@@ -31,7 +31,7 @@ public class Downloader implements Runnable{
         //utilizar jsoup quando encontra um outro url para indexar cria outro Downloader (mais ou menos isto,acho)
 
 
-
+        
         //envia dados para colocar nos Barrels por multicast
         try {
             socket.joinGroup(group);
