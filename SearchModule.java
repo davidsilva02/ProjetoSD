@@ -7,6 +7,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Random;
 
 public class SearchModule extends UnicastRemoteObject implements RMI {
 
@@ -39,19 +40,25 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     public String resultadoPesquisa(String termo_pesquisa) throws RemoteException {
         System.out.printf("Client pesquisou %s \n",termo_pesquisa);
 
-        //testar com barrel 0 (depois tem de ser diferente)
-        int barrel_a_procurar = barrels.get(0);
-
-        String address_barrel="rmi://localhost:"+ barrel_a_procurar+ "/barrel";
+        boolean hasReceived = false;
         BarrelsRMI barrel=null;
-        try {
-            barrel=(BarrelsRMI) Naming.lookup(address_barrel);
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NotBoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
+        // loop through barrels while we can't get an answer
+        while (!hasReceived){
+            //get random barrel from the list
+            int barrel_a_procurar = barrels.get(new Random().nextInt(barrels.size()));
+            String address_barrel="rmi://localhost:"+ barrel_a_procurar+ "/barrel";
+            
+            try {
+                barrel=(BarrelsRMI) Naming.lookup(address_barrel);
+                hasReceived = true;
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NotBoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         
         return barrel.resultadoPesquisa(termo_pesquisa);
