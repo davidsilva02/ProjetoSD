@@ -8,10 +8,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 
-public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelsRMI{
+public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRMI{
     private String MULTICAST_ADDRESS = "224.3.2.1";
     private int PORT = 4321;
-    private static int rmi_port;
     MulticastSocket socket;
     InetAddress group;
     RMI server;
@@ -36,21 +35,12 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelsR
     }
 
     public static void main(String[] args) throws RemoteException {
-        IndexStorageBarrels h = new IndexStorageBarrels();
-
-        rmi_port=(int) (Math.random()* (10000 - 1000 + 1) + 1000);
-
-    
-        //cria registo rmi para o server comunicar com o barrel
-        LocateRegistry.createRegistry(rmi_port).rebind("barrel", h);
-
-        System.out.printf("BARREL WITH PORT %d\n", rmi_port);        
-        IndexStorageBarrels in = new IndexStorageBarrels();
-        in.start();
+        IndexStorageBarrels t = new IndexStorageBarrels();
+        System.out.printf("BARREL WITH HASH %d\n", t.hashCode());        
+        t.start();
     }
     
     public void start(){
-
         //adiciona socket multicast
         try {
             socket.joinGroup(group);
@@ -61,7 +51,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelsR
 
          //envia ao server que existe um barrel disponivel
          try {
-            server.connectBarrel(rmi_port);
+            server.AvailableBarrel(this);
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -80,8 +70,6 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelsR
             String url = new String(recv.getData(), 0, recv.getLength());
             System.out.printf("INFO A INSERIR %s \n",url);
         }
-
-
     }
 
     @Override
@@ -91,7 +79,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelsR
         //marca barrel como ocupado
          //envia ao server que o barrel ja nao esta disponivel
          try {
-            server.notAvailableBarrel(rmi_port);
+            server.notAvailableBarrel(this);
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -104,7 +92,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelsR
 
         //marca barrel como disponivel
         try {
-            server.connectBarrel(rmi_port);
+            server.AvailableBarrel(this);
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

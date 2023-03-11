@@ -25,18 +25,20 @@ public class RMIClient {
     public void start(){
         System.out.println("CLIENT A CORRER...");
 
+        String input;
         while(true){
            int opt=menu();
-           String input = sc.nextLine();
            if(opt==1) {
+            input = sc.nextLine();
             try {
-                server.indexURL(input);
+                server.putUrl(input);
             } catch (RemoteException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
            }
            if (opt==2){
+                input = sc.nextLine();
                try {
                    String result=server.resultadoPesquisa(input);
                    System.out.println(result);
