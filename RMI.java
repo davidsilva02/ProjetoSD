@@ -12,5 +12,7 @@ public interface RMI extends Remote {
 
     public void notAvailableBarrel(int rmi_port) throws java.rmi.RemoteException;
 
-    
+    public String getUrl() throws RemoteException;
+
+    public void putUrl(String newUrl) throws RemoteException;
 }

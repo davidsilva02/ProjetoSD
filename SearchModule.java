@@ -8,11 +8,12 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Random;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class SearchModule extends UnicastRemoteObject implements RMI {
 
     private CopyOnWriteArrayList<Integer> barrels = new CopyOnWriteArrayList<>();
-
+    private LinkedBlockingQueue<String> urlQueue = new LinkedBlockingQueue<>();
 
 
 
@@ -48,7 +49,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
             //get random barrel from the list
             int barrel_a_procurar = barrels.get(new Random().nextInt(barrels.size()));
             String address_barrel="rmi://localhost:"+ barrel_a_procurar+ "/barrel";
-            
+
             try {
                 barrel=(BarrelsRMI) Naming.lookup(address_barrel);
                 hasReceived = true;
@@ -85,5 +86,33 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         //remove barrel
         barrels.remove(barrels.indexOf(rmi_port));
         System.out.printf("BARREL %d ESTA OCUPADO\n",rmi_port);
+    }
+
+    @Override
+    public String getUrl() throws RemoteException {
+    
+        
+        String newUrl = null;
+
+        while( newUrl == null ){
+            try{
+                newUrl = urlQueue.take();
+            }catch(InterruptedException e){
+                System.out.println("Exception taking an url from the queue: " +  e);;
+            }
+        }
+
+        return newUrl;
+    }
+
+    @Override
+    public void putUrl(String newUrl) throws RemoteException {
+
+        try{
+            urlQueue.add(newUrl);
+        }catch(IllegalStateException e){
+            System.out.println("Exception puting an url from the queue: " +  e);;
+        }
+
     }
 }
