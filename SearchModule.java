@@ -111,7 +111,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         try{
             urlQueue.add(newUrl);
         }catch(IllegalStateException e){
-            System.out.println("Exception puting an url from the queue: " +  e);;
+            System.out.println("Exception puting an url in the queue: " +  e);;
         }
 
     }
