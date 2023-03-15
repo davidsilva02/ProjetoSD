@@ -31,15 +31,15 @@ public class Downloader{
 
     private void start() {
         String nextUrl = null;
-        try{
-            while(true){
-                //receive new url from the queue on the search module
-                nextUrl = server.getUrl();
-                new AnalisadorJSOUP(nextUrl);
+        
+        while(true){
+            try{
+                    //receive new url from the queue on the search module
+                    nextUrl = server.getUrl();
+                    new AnalisadorJSOUP(nextUrl);
+            }catch(Exception e){
+                System.out.println("Exception on downloader: " + e.getMessage());
             }
-        }catch(Exception e){
-            System.out.println("Exception on downloader: " + e.getMessage());
-        }
-
+        
     }
 }

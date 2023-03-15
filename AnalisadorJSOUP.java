@@ -6,6 +6,11 @@ import java.net.MulticastSocket;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import java.util.StringTokenizer;
 
 public class AnalisadorJSOUP implements Runnable {
 
@@ -48,7 +53,18 @@ public class AnalisadorJSOUP implements Runnable {
 
 
         //utilizar jsoup quando encontra um outro url para indexar cria outro Downloader (mais ou menos isto,acho)
-
+        try {
+            Document doc = Jsoup.connect(url).get();
+            StringTokenizer tokens = new StringTokenizer(doc.text());
+            int countTokens = 0;
+            while (tokens.hasMoreElements() && countTokens++ < 100) System.out.println(tokens.nextToken().toLowerCase());
+            //Elements links = doc.select("a[href]");
+            //for (Element link : links)System.out.println(link.text() + "\n" + link.attr("abs:href") + "\n");
+        } 
+        catch (IOException e) 
+        {
+            e.printStackTrace();
+        }
 
         
         //envia dados para colocar nos Barrels por multicast
