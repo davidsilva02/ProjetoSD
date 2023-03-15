@@ -25,21 +25,27 @@ public class Downloader{
 
     }
     public static void main(String[] args){
-        Downloader dw = new Downloader();
-        dw.start();
+        // Downloader dw = new Downloader();
+
+        for(int i = 0; i < Integer.parseInt(args[0]); i++)
+            new AnalisadorJSOUP("Downloader" + Integer.toString(i));
+        
+        // for(int i = 0; i < Integer.parseInt(args[0]); i++)
+        //TODO: JOIN
+
     }
 
-    private void start() {
-        String nextUrl = null;
+    // private void start() {
+    //     String nextUrl = null;
         
-        while(true){
-            try{
-                    //receive new url from the queue on the search module
-                    nextUrl = server.getUrl();
-                    new AnalisadorJSOUP(nextUrl);
-            }catch(Exception e){
-                System.out.println("Exception on downloader: " + e.getMessage());
-            }
+    //     while(true){
+    //         try{
+    //                 //receive new url from the queue on the search module
+    //                 nextUrl = server.getUrl();
+                    
+    //         }catch(Exception e){
+    //             System.out.println("Exception on downloader: " + e.getMessage());
+    //         }
         
-    }
+    // }
 }

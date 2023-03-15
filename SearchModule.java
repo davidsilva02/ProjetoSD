@@ -5,6 +5,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+// import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -13,6 +14,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
     private CopyOnWriteArrayList<BarrelRMI> barrels=new CopyOnWriteArrayList<>();
     private LinkedBlockingQueue<String> urlQueue = new LinkedBlockingQueue<>();
+    // private ConcurrentLinkedQueue;
 
 
 
