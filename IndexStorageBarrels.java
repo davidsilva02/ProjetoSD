@@ -6,6 +6,10 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 
 public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRMI{
@@ -14,9 +18,15 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     MulticastSocket socket;
     InetAddress group;
     RMI server;
+    HashMap<String,HashSet<infoURL>> ind;
+    HashMap<String,infoURL> urls;
+
 
     public IndexStorageBarrels() throws RemoteException{
         super();
+
+        this.ind= new HashMap<>();
+        this.urls= new HashMap<>();
 
         try {
             this.socket=new MulticastSocket(PORT);
@@ -67,8 +77,50 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 e.printStackTrace();
             }
             
-            String url = new String(recv.getData(), 0, recv.getLength());
-            System.out.printf("INFO A INSERIR %s \n",url);
+            String pack = new String(recv.getData(), 0, recv.getLength());
+            System.out.printf("INFO A INSERIR %s \n",pack);
+
+            
+            //indexar info recebida por multicast pelos downloaders
+            String url="";
+            String title="";
+            String citation="";
+            List <String> termos = new ArrayList<>();
+            List <String> hip = new ArrayList<>();
+
+            infoURL urlAtual=null;
+            if(!urls.containsKey(url)){
+                urlAtual=new infoURL(url,title, citation);
+            }
+            else {
+                urlAtual=urls.get(url);
+                urlAtual.setTitle(title);
+                urlAtual.setCitation(citation);
+            }
+
+            for (String termoString: termos){
+                if(!ind.containsKey(termoString)){
+                    //temos de criar entrada                
+                    HashSet<infoURL> urls = new HashSet<>();
+                    urls.add(urlAtual);
+                    ind.put(termoString,urls);
+                }
+                else {
+                    ind.get(termoString).add(urlAtual);
+                }
+            }
+    
+            for (String hipString : hip){
+                if(!urls.containsKey(hipString)){
+                    infoURL info = new infoURL(url);
+                    info.addURL(urlAtual);
+                    urls.put(hipString,info);
+                }
+                else {
+                    infoURL existente =urls.get(hipString);
+                    existente.addURL(urlAtual);
+                }
+            }
         }
     }
 
