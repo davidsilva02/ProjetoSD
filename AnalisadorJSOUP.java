@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.MulticastSocket;
+import java.net.SocketException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -24,7 +25,6 @@ public class AnalisadorJSOUP implements Runnable {
     MulticastSocket socket;
     InetAddress group;
     RMI server;
-
     String url;
 
 
@@ -32,9 +32,9 @@ public class AnalisadorJSOUP implements Runnable {
         super();
 
         try {
-            this.socket=new MulticastSocket(PORT);
+            this.socket=new MulticastSocket();
             this.group=InetAddress.getByName(MULTICAST_ADDRESS);
-            socket.joinGroup(group); 
+            //socket.joinGroup(group); 
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -48,8 +48,6 @@ public class AnalisadorJSOUP implements Runnable {
             e.printStackTrace();
         }
 
-
-
         new Thread(this,threadName).start();
     }
     
@@ -62,10 +60,9 @@ public class AnalisadorJSOUP implements Runnable {
         Boolean ack;
 
         while(true){
-            System.out.printf("O DOWNLOADER COMEÇOU A INDEXAR O URL %s \n",url);
             newUrl = null;
             ack = false;
-
+            
             //ir buscar URL à queue
             while(newUrl == null){
                 try{
@@ -77,42 +74,51 @@ public class AnalisadorJSOUP implements Runnable {
                 }
             }
             
+            System.out.printf("O DOWNLOADER COMEÇOU A INDEXAR O URL %s \n",newUrl);
+            JSOUPData j=null;
+            
             //utilizar jsoup quando encontra um outro url para indexar cria outro Downloader (mais ou menos isto,acho)
             //meter tudo num objeto serializable
-            HashSet<String> urls = new HashSet<>(); //?!?!!??!?!?!?!?
-            HashMap<String,HashSet<String>> indx = new HashMap<>();
+            // HashSet<String> urls = new HashSet<>(); //?!?!!??!?!?!?!?
+            // HashMap<String,HashSet<String>> indx = new HashMap<>();
             try {
 
-                Document doc = Jsoup.connect(url).get();
-                StringTokenizer tokens = new StringTokenizer(doc.text());
+                Document doc = Jsoup.connect(newUrl).get();
+                String title = doc.title();
+                //so para testar citacao
+                String citation=doc.text().substring(0,5);
 
+                StringTokenizer tokens = new StringTokenizer(doc.text());
+                j=new JSOUPData(title, newUrl, citation);
                 while (tokens.hasMoreElements()){
                     // System.out.println(tokens.nextToken().toLowerCase());
-
-                    //adicionar ao index
-                    if( !indx.containsKey(tokens.nextToken())){ //não está no index
-                        HashSet<String> tempUrls = new HashSet<String>();
-                        tempUrls.add(newUrl);
-                        indx.put(tokens.nextToken(),tempUrls);
-                    }
-                    else{ //está no index
-                        HashSet<String> tempUrls = indx.get(tokens.nextToken());
-                        tempUrls.add(newUrl);
-                        indx.put(tokens.nextToken(),tempUrls);
-                    }
+                    j.addTermo(tokens.nextToken().toLowerCase());
+                    // //adicionar ao index
+                    // if( !indx.containsKey(tokens.nextToken())){ //não está no index
+                    //     HashSet<String> tempUrls = new HashSet<String>();
+                    //     tempUrls.add(newUrl);
+                    //     indx.put(tokens.nextToken(),tempUrls);
+                    // }
+                    // else{ //está no index
+                    //     HashSet<String> tempUrls = indx.get(tokens.nextToken());
+                    //     tempUrls.add(newUrl);
+                    //     indx.put(tokens.nextToken(),tempUrls);
+                    // }
                 } 
 
                 //get urls
                 Elements links = doc.select("a[href]");
                 for (Element link : links){    
-                    System.out.println(link.text() + "\n" + link.attr("abs:href") + "\n");
-                    urls.add(link.attr("abs:href"));
+                    j.addHip(link.attr("abs:href"));
+                    server.putUrl(link.attr("abs:href"));
+                    // System.out.println(link.text() + "\n" + link.attr("abs:href") + "\n");
+                    // urls.add(link.attr("abs:href"));
                 }
                 
-                //FAZER OQ COM OS URLS NOVOS?!?!!?
-                //METER NA FILA?
-                for(String str: urls)
-                    server.putUrl(str);
+                // //FAZER OQ COM OS URLS NOVOS?!?!!?
+                // //METER NA FILA?
+                // for(String str: urls)
+                //     server.putUrl(str);
                 
 
             }
@@ -122,35 +128,89 @@ public class AnalisadorJSOUP implements Runnable {
             }
 
             
-            //envia dados para colocar nos Barrels por multicast
-            for(int i = 0; i < numTries || ack; i++){
-                try {
-                    //Convert HashMap to ByteArray
-                    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-                    ObjectOutputStream out = new ObjectOutputStream(byteOut);
-                    out.writeObject(indx);
-                    byte buffer [] = byteOut.toByteArray();
+        //     //envia dados para colocar nos Barrels por multicast
+        //     for(int i = 0; i < numTries || ack; i++){
+        //         try {
+        //             //Convert HashMap to ByteArray
+        //             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        //             ObjectOutputStream out = new ObjectOutputStream(byteOut);
+        //             out.writeObject(indx);
+        //             byte buffer [] = byteOut.toByteArray();
                     
-                    //send the hashmap (index) to the ISB
-                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                    socket.send(packet);
+        //             //send the hashmap (index) to the ISB
+        //             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+        //             socket.send(packet);
 
-                    //timeout e get ack
-                    socket.setSoTimeout(timeout);
+        //             //timeout e get ack
+        //             socket.setSoTimeout(timeout);
 
-                    DatagramPacket ackDgram = new DatagramPacket(buffer, buffer.length);	
-					socket.receive(ackDgram);
+        //             DatagramPacket ackDgram = new DatagramPacket(buffer, buffer.length);	
+		// 			socket.receive(ackDgram);
 
-                    ack = true;
+        //             ack = true;
 
-                } catch (Exception e) {
+        //         } catch (Exception e) {
+        //             e.printStackTrace();
+        //         }
+        //     }
+        // }
+
+        //TODO: Algumas excecoes ocorrem em cima e manda o objeto a null
+        if(j!=null){
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            ObjectOutputStream out;
+            try {
+                out = new ObjectOutputStream(byteOut);
+                out.writeObject(j);
+    
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+    
+            byte buffer [] = byteOut.toByteArray();
+            System.out.println(buffer.length);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+            try {
+                socket.send(packet);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+    
+            //TODO: abordagem ainda nao esta completa, temos de saber quantos barrels temos, e a busca por resposta tem de ter limites (??)
+            
+            HashSet<Integer> hashs = new HashSet<>();
+            int number_of_barrels=1;
+            while(hashs.size()!=number_of_barrels){
+                byte buffe[]=new byte[20];
+                DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
+                
+                // try {
+                //     socket.setSoTimeout(10000);
+                // } catch (SocketException e) {
+                //     // TODO Auto-generated catch block
+                //     // e.printStackTrace();
+                // }
+    
+                try {
+                    socket.receive(rec);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+                
+               String num = new String(rec.getData(), 0, rec.getLength());
+               hashs.add(Integer.parseInt(num));
+            }
+    
+    
+            
+            System.out.println("TODOS RECEBERAM");
             }
 
         }
 
-        //
     }
     
 }

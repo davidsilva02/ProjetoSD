@@ -77,6 +77,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         while( newUrl == null ){
             try{
                 newUrl = urlQueue.take();
+                urlQueue.remove(newUrl);
             }catch(InterruptedException e){
                 System.out.println("Exception taking an url from the queue: " +  e);
             }

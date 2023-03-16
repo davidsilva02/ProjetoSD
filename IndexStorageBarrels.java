@@ -1,7 +1,10 @@
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.nio.ByteBuffer;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -68,7 +71,11 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         }
 
         while(true){
-            byte[] buf = new byte[1000];
+
+            //TODO: temos de mandar uma mensagem com o tamanho da classe que serializamos?
+
+            //para colocarmos aqui o tamanho certo
+            byte[] buf = new byte[1000000];
             DatagramPacket recv = new DatagramPacket(buf, buf.length);
             try {
                 socket.receive(recv);
@@ -76,17 +83,50 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+
+
             
-            String pack = new String(recv.getData(), 0, recv.getLength());
-            System.out.printf("INFO A INSERIR %s \n",pack);
+            // String pack = new String(recv.getData(), 0, recv.getLength());
+            // System.out.printf("INFO A INSERIR %s \n",pack);
+
+            InetAddress senderAddress = recv.getAddress();
+            int senderPort = recv.getPort();
+            // System.out.println("Endereço IP do programa que enviou os dados multicast: " + senderAddress.getHostAddress());
+            // System.out.println("Porta do programa que enviou os dados multicast: " + senderPort);
+            
+            // Crie um pacote de dados para enviar de volta ao remetente
+            byte[] sendData = Integer.toString(this.hashCode()).getBytes();
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, senderAddress, senderPort);
+            try {
+                socket.send(sendPacket);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            ByteArrayInputStream bis = new ByteArrayInputStream(buf);
+            ObjectInputStream ois;
+            JSOUPData obj=null;
+            try {
+                ois = new ObjectInputStream(bis);
+                obj = (JSOUPData) ois.readObject();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
 
             
             //indexar info recebida por multicast pelos downloaders
-            String url="";
-            String title="";
-            String citation="";
-            List <String> termos = new ArrayList<>();
-            List <String> hip = new ArrayList<>();
+            String url=obj.getUrl();
+            System.out.println("A indexar o objeto com url " + url);
+            String title=obj.getTitle();
+            String citation=obj.getCitation();
+            List <String> termos = obj.getTermos();
+            List <String> hip = obj.getHip();
 
             infoURL urlAtual=null;
             if(!urls.containsKey(url)){
