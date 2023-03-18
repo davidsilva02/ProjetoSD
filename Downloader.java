@@ -26,7 +26,9 @@ public class Downloader{
         // Downloader dw = new Downloader();
 
         //TODO: Colocar por argumento o numero de threads a criar
-        for(int i = 0; i < Integer.parseInt("5"); i++) {new AnalisadorJSOUP("Downloader" + Integer.toString(i));}
+        for(int i = 0; i < Integer.parseInt("5"); i++) {
+           new  AnalisadorJSOUP("Downloader" + Integer.toString(i));
+        }
         
         // for(int i = 0; i < Integer.parseInt(args[0]); i++)
         //TODO: JOIN

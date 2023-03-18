@@ -35,4 +35,16 @@ public class infoURL {
     public int numeroURL(infoURL url){
         return urls.size();
     }
+    public String getUrl() {
+        return url;
+    }
+    public void setUrl(String url) {
+        this.url = url;
+    }
+    public HashSet<infoURL> getUrls() {
+        return urls;
+    }
+    public void setUrls(HashSet<infoURL> urls) {
+        this.urls = urls;
+    }
 }

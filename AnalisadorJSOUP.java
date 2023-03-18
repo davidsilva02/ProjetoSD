@@ -26,6 +26,7 @@ public class AnalisadorJSOUP implements Runnable {
     InetAddress group;
     RMI server;
     String url;
+    Thread t;
 
 
     public AnalisadorJSOUP(String threadName){
@@ -46,9 +47,11 @@ public class AnalisadorJSOUP implements Runnable {
         } catch (MalformedURLException | RemoteException | NotBoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            System.exit(0);
         }
 
-        new Thread(this,threadName).start();
+        this.t=new Thread(this,threadName);
+        t.start();
     }
     
     @Override
@@ -70,7 +73,7 @@ public class AnalisadorJSOUP implements Runnable {
                     newUrl = server.getUrl();
                     
                 }catch(Exception e){
-                    System.out.println("Exception on downloader: " + e.getMessage());
+                    //System.out.println("Exception on downloader: " + e.getMessage());
                 }
             }
             
@@ -122,8 +125,9 @@ public class AnalisadorJSOUP implements Runnable {
                 
 
             }
-            catch (IOException e) 
+            catch (Exception e) 
             {
+                j=null;
                 e.printStackTrace();
             }
 
@@ -169,17 +173,20 @@ public class AnalisadorJSOUP implements Runnable {
             }
     
             byte buffer [] = byteOut.toByteArray();
-            System.out.println(buffer.length);
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+            int tamanho_envio=buffer.length;
+
+            //mandar tamanho
+            byte buf[]=Integer.toString(tamanho_envio).getBytes();
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, group, PORT);
             try {
                 socket.send(packet);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-    
-            //TODO: abordagem ainda nao esta completa, temos de saber quantos barrels temos, e a busca por resposta tem de ter limites (??)
             
+            //TODO: abordagem ainda nao esta completa, temos de saber quantos barrels temos, e a busca por resposta tem de ter limites (??)
+            //esperamos que todos recebam o tamanho
             HashSet<Integer> hashs = new HashSet<>();
             int number_of_barrels=1;
             while(hashs.size()!=number_of_barrels){
@@ -203,9 +210,43 @@ public class AnalisadorJSOUP implements Runnable {
                String num = new String(rec.getData(), 0, rec.getLength());
                hashs.add(Integer.parseInt(num));
             }
-    
-    
+
+            System.out.println("TODOS RECEBERAM O TAMANHO");
+
+            //enviar JSOUPData
+            packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+            try {
+                socket.send(packet);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             
+            hashs = new HashSet<>();
+            number_of_barrels=1;
+            while(hashs.size()!=number_of_barrels){
+                byte buffe[]=new byte[20];
+                DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
+                
+                // try {
+                //     socket.setSoTimeout(10000);
+                // } catch (SocketException e) {
+                //     // TODO Auto-generated catch block
+                //     // e.printStackTrace();
+                // }
+    
+                try {
+                    socket.receive(rec);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                
+               String num = new String(rec.getData(), 0, rec.getLength());
+               hashs.add(Integer.parseInt(num));
+            }
+    
+
             System.out.println("TODOS RECEBERAM");
             }
 
