@@ -1,0 +1,8 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "jars/jsoup-1.15.4.jar"
+    ],
+    "java.project.outputPath": "out",
+
+}
