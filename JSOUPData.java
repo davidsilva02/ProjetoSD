@@ -8,7 +8,7 @@ public class JSOUPData implements Serializable{
 
     private String title;
     private String url;
-    private String citation;
+    private String citation; //TODO trocar por 1 objeto infoURL?
     private List<String> termos;
     private List <String> hip;
 

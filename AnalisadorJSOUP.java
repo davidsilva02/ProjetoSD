@@ -113,7 +113,7 @@ public class AnalisadorJSOUP implements Runnable {
                 Elements links = doc.select("a[href]");
                 for (Element link : links){    
                     j.addHip(link.attr("abs:href"));
-                    server.putUrl(link.attr("abs:href"));
+                    server.putUrl(link.attr("abs:href")); //não seria melhor fzer isto só no fim? ns
                     // System.out.println(link.text() + "\n" + link.attr("abs:href") + "\n");
                     // urls.add(link.attr("abs:href"));
                 }

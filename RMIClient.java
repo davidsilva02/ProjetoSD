@@ -28,29 +28,35 @@ public class RMIClient {
         String input;
         while(true){
            int opt=menu();
-           if(opt==1) {
-            input = sc.nextLine();
-            try {
-                server.putUrl(input);
-            } catch (RemoteException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-           }
-           if (opt==2){
+
+           switch(opt){
+            case 1: // INDEX NEW URL
+                input = sc.nextLine();
+                try {
+                    server.putUrl(input);
+                } catch (RemoteException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                break;
+
+            case 2: // MAKE A SEARCH
                 input = sc.nextLine();
                try {
                    String result=server.resultadoPesquisa(input);
                    System.out.println(result);
                } catch (RemoteException e) {
-                   // TODO Auto-generated catch block
                    e.printStackTrace();
                }
-           }
+               break;
 
-           if(opt==0){
+           case 0: // CLOSE
             System.exit(0);
-           }
+           
+            default: //ERROR
+               System.out.println("Invalid command: ");
+               
+            }
         }
     }
 

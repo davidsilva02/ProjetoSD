@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 
 public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRMI{
     private String MULTICAST_ADDRESS = "224.3.2.1";
@@ -24,8 +25,8 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     MulticastSocket socket;
     InetAddress group;
     RMI server;
-    ConcurrentHashMap<String,HashSet<infoURL>> ind;
-    ConcurrentHashMap<String,infoURL> urls;
+    ConcurrentHashMap<String,HashSet<infoURL>> ind; // termo: LINKS QUE CONTÉM O TERMO
+    ConcurrentHashMap<String,infoURL> urls; // fatherUrl: LISTA DE URLS QUE FAZEM REFERENCIA PARA O fatherUrl
 
 
     public IndexStorageBarrels() throws RemoteException{
@@ -167,7 +168,8 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                         urlAtual.setTitle(title);
                         urlAtual.setCitation(citation);
                     }
-        
+                    
+                    // adicionar cada termo encontrado no index se não existir, se existir apenas adicionar o url como value
                     for (String termoString: termos){
                         if(!ind.containsKey(termoString)){
                             //temos de criar entrada                
@@ -179,7 +181,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                             ind.get(termoString).add(urlAtual);
                         }
                     }
-            
+                    
                     for (String hipString : hip){
                         if(!urls.containsKey(hipString)){
                             infoURL info = new infoURL(url);
@@ -204,17 +206,44 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         String result;
 
         //marca barrel como ocupado
-         //envia ao server que o barrel ja nao esta disponivel
-         try {
+        //envia ao server que o barrel ja nao esta disponivel
+        try {
             server.notAvailableBarrel(this);
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
+        // procurar pelo termo
+        HashSet<infoURL> termSearch = ind.get(termo_pesquisa);
+        
+        // se encontrarmos o termo
+        if( termSearch != null ) {
+            List<Integer> numReferences = new ArrayList<Integer>();
 
-        if(termo_pesquisa.equals("ABC")) result="COM RESULTADOS";
-        else result="SEM RESULTADOS";
+            // iterar os urls relativos ao termo encontrado
+            for(infoURL newUrl: termSearch){
+    
+                // ir buscar o numero de urls que fazem referencia para cada URL do termo (posterior ordenacao)
+                numReferences.add( urls.get(newUrl.getUrl()).getUrls().size() );
+            }
+
+            //TODO ordenar os links da pesquisa pelo nr de referencias
+            HashSet<infoURL> sortedResults = IntStream.range(0, numReferences.size()).boxed()
+                                            .sorted(Comparator.comparingInt(i -> numReferences[i]))
+                                            .map(i -> termSearch[i])
+                                            .toArray(HashSet<infoURL>::new);
+            
+        //     String[] sorted = IntStream.range(0, boosts.length).boxed()
+        // .sorted(Comparator.comparingInt(i -> boosts[i]))
+        // .map(i -> strings[i])
+        // .toArray(String[]::new);
+            
+        }else{
+
+        }
+        // if(termo_pesquisa.equals("ABC")) result="COM RESULTADOS";
+        // else result="SEM RESULTADOS";
 
 
         //marca barrel como disponivel
@@ -225,6 +254,6 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             e.printStackTrace();
         }
         
-        return result;
+        return null;
     }
 }
