@@ -2,6 +2,7 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Scanner;
 
 public class RMIClient {
@@ -43,8 +44,9 @@ public class RMIClient {
             case 2: // MAKE A SEARCH
                 input = sc.nextLine();
                try {
-                   String result=server.resultadoPesquisa(input);
+                   List<infoURL> result=server.resultadoPesquisa(input);
                    System.out.println(result);
+                   
                } catch (RemoteException e) {
                    e.printStackTrace();
                }

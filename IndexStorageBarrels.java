@@ -12,6 +12,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -202,7 +203,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     }
 
     @Override
-    public String resultadoPesquisa(String termo_pesquisa) throws RemoteException {
+    public List<infoURL> resultadoPesquisa(String termo_pesquisa) throws RemoteException {
         String result;
 
         //marca barrel como ocupado
@@ -215,6 +216,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         }
 
         // procurar pelo termo
+        List<infoURL> sortedTermSearch = null;
         HashSet<infoURL> termSearch = ind.get(termo_pesquisa);
         
         // se encontrarmos o termo
@@ -228,23 +230,13 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 numReferences.add( urls.get(newUrl.getUrl()).getUrls().size() );
             }
 
-            //TODO ordenar os links da pesquisa pelo nr de referencias
-            HashSet<infoURL> sortedResults = IntStream.range(0, numReferences.size()).boxed()
-                                            .sorted(Comparator.comparingInt(i -> numReferences[i]))
-                                            .map(i -> termSearch[i])
-                                            .toArray(HashSet<infoURL>::new);
-            
-        //     String[] sorted = IntStream.range(0, boosts.length).boxed()
-        // .sorted(Comparator.comparingInt(i -> boosts[i]))
-        // .map(i -> strings[i])
-        // .toArray(String[]::new);
-            
-        }else{
 
+            //ordenar os links da pesquisa pelo nr de referencias
+            sortedTermSearch = new ArrayList<>(termSearch);
+            sortedTermSearch.sort(Comparator.comparing(infoURL::numeroURL));   
         }
         // if(termo_pesquisa.equals("ABC")) result="COM RESULTADOS";
         // else result="SEM RESULTADOS";
-
 
         //marca barrel como disponivel
         try {
@@ -254,6 +246,6 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             e.printStackTrace();
         }
         
-        return null;
+        return sortedTermSearch;
     }
 }

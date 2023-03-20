@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 // import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -50,20 +51,33 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         return result;
     }
 
-    public String pesquisa_barrel(String termo_pesquisa){
-        String result=null;
+    /**
+     * 
+     * @param termo_pesquisa
+     * @return List<infoURL> if everything is OK, null if there was no result or no available barrels
+     */
+    public List<infoURL> pesquisa_barrel(String termo_pesquisa){
+        List<infoURL> result=null;
         boolean hasValid=false;
+        
         // loop through barrels while we can't get an answer
         while (!hasValid){
             //get random barrel from the list
-            if(barrels.size()==0) {result="SEM BARRELS DISPONIVEIS";break;}
+            if(barrels.size()==0) {
+                result=null;
+            }
+
             BarrelRMI barrel_a_procurar = barrels.get(new Random().nextInt(barrels.size()));
+            
             try {
                 result = barrel_a_procurar.resultadoPesquisa(termo_pesquisa);
                 hasValid=true;
             } catch (RemoteException e) {
+
                 barrels.remove(barrels.indexOf(barrel_a_procurar));
-                if(barrels.size()==0) {result="SEM BARRELS DISPONIVEIS";break;}
+                if(barrels.size()==0) {
+                    result=null;
+                }
                 e.printStackTrace();
                 }
             }

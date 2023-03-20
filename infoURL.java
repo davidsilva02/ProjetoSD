@@ -32,8 +32,8 @@ public class infoURL {
         return urls.add(url);
     }
 
-    public int numeroURL(infoURL url){
-        return urls.size();
+    public int numeroURL(){
+        return this.urls.size();
     }
     public String getUrl() {
         return url;
@@ -47,4 +47,11 @@ public class infoURL {
     public void setUrls(HashSet<infoURL> urls) {
         this.urls = urls;
     }
+
+    @Override //TODO fazer um toString direito para facilitar o print dos links no cliente
+    public String toString() {
+        return null;
+    }
+
+    
 }
