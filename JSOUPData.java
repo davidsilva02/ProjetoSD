@@ -1,6 +1,7 @@
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 /**
  * Classe que envia todos os dados para os barrels
  */
@@ -11,7 +12,6 @@ public class JSOUPData implements Serializable{
     private String citation; //TODO trocar por 1 objeto infoURL?
     private List<String> termos;
     private List <String> hip;
-
     
     public JSOUPData(String title, String url, String citation) {
         this.title = title;

@@ -17,29 +17,32 @@ import org.jsoup.select.Elements;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.StringTokenizer;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 
 public class AnalisadorJSOUP implements Runnable {
 
     private String MULTICAST_ADDRESS = "224.3.2.1";
     private int PORT = 4321;
-    MulticastSocket socket;
-    InetAddress group;
+    // MulticastSocket socket;
+    // InetAddress group;
     RMI server;
-    String url;
+    // String url;
     Thread t;
+    BlockingQueue<JSOUPData> l;
 
 
-    public AnalisadorJSOUP(String threadName){
+    public AnalisadorJSOUP(String threadName,BlockingQueue<JSOUPData> l){
         super();
 
-        try {
-            this.socket=new MulticastSocket();
-            this.group=InetAddress.getByName(MULTICAST_ADDRESS);
-            //socket.joinGroup(group); 
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        // try {
+        //     this.socket=new MulticastSocket();
+        //     this.group=InetAddress.getByName(MULTICAST_ADDRESS);
+        //     //socket.joinGroup(group); 
+        // } catch (IOException e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
 
         // Get the reference to the server to future RMI calls
         try {
@@ -49,6 +52,8 @@ public class AnalisadorJSOUP implements Runnable {
             e.printStackTrace();
             System.exit(0);
         }
+
+        this.l=l;
 
         this.t=new Thread(this,threadName);
         t.start();
@@ -77,7 +82,7 @@ public class AnalisadorJSOUP implements Runnable {
                 }
             }
             
-            System.out.printf("O DOWNLOADER COMEÇOU A INDEXAR O URL %s \n",newUrl);
+            // System.out.printf("O DOWNLOADER COMEÇOU A INDEXAR O URL %s \n",newUrl);
             JSOUPData j=null;
             
             //utilizar jsoup quando encontra um outro url para indexar cria outro Downloader (mais ou menos isto,acho)
@@ -90,7 +95,7 @@ public class AnalisadorJSOUP implements Runnable {
                 String title = doc.title();
                 //so para testar citacao
                 String citation=doc.text().substring(0,5);
-
+                
                 StringTokenizer tokens = new StringTokenizer(doc.text());
                 j=new JSOUPData(title, newUrl, citation);
                 while (tokens.hasMoreElements()){
@@ -160,95 +165,96 @@ public class AnalisadorJSOUP implements Runnable {
         // }
 
         //TODO: Algumas excecoes ocorrem em cima e manda o objeto a null
-        if(j!=null){
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            ObjectOutputStream out;
-            try {
-                out = new ObjectOutputStream(byteOut);
-                out.writeObject(j);
+        if(j!=null) l.add(j);
+        // if(j!=null){
+        //     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        //     ObjectOutputStream out;
+        //     try {
+        //         out = new ObjectOutputStream(byteOut);
+        //         out.writeObject(j);
     
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        //     } catch (IOException e) {
+        //         // TODO Auto-generated catch block
+        //         e.printStackTrace();
+        //     }
     
-            byte buffer [] = byteOut.toByteArray();
-            int tamanho_envio=buffer.length;
+        //     byte buffer [] = byteOut.toByteArray();
+        //     int tamanho_envio=buffer.length;
 
-            //mandar tamanho
-            byte buf[]=Integer.toString(tamanho_envio).getBytes();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, group, PORT);
-            try {
-                socket.send(packet);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        //     //mandar tamanho
+        //     byte buf[]=Integer.toString(tamanho_envio).getBytes();
+        //     DatagramPacket packet = new DatagramPacket(buf, buf.length, group, PORT);
+        //     try {
+        //         socket.send(packet);
+        //     } catch (IOException e) {
+        //         // TODO Auto-generated catch block
+        //         e.printStackTrace();
+        //     }
             
-            //TODO: abordagem ainda nao esta completa, temos de saber quantos barrels temos, e a busca por resposta tem de ter limites (??)
-            //esperamos que todos recebam o tamanho
-            HashSet<Integer> hashs = new HashSet<>();
-            int number_of_barrels=1;
-            while(hashs.size()!=number_of_barrels){
-                byte buffe[]=new byte[20];
-                DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
+        //     //TODO: abordagem ainda nao esta completa, temos de saber quantos barrels temos, e a busca por resposta tem de ter limites (??)
+        //     //esperamos que todos recebam o tamanho
+        //     HashSet<Integer> hashs = new HashSet<>();
+        //     int number_of_barrels=1;
+        //     while(hashs.size()!=number_of_barrels){
+        //         byte buffe[]=new byte[20];
+        //         DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
                 
-                // try {
-                //     socket.setSoTimeout(10000);
-                // } catch (SocketException e) {
-                //     // TODO Auto-generated catch block
-                //     // e.printStackTrace();
-                // }
+        //         // try {
+        //         //     socket.setSoTimeout(10000);
+        //         // } catch (SocketException e) {
+        //         //     // TODO Auto-generated catch block
+        //         //     // e.printStackTrace();
+        //         // }
     
-                try {
-                    socket.receive(rec);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+        //         try {
+        //             socket.receive(rec);
+        //         } catch (IOException e) {
+        //             // TODO Auto-generated catch block
+        //             e.printStackTrace();
+        //         }
                 
-               String num = new String(rec.getData(), 0, rec.getLength());
-               hashs.add(Integer.parseInt(num));
-            }
+        //        String num = new String(rec.getData(), 0, rec.getLength());
+        //        hashs.add(Integer.parseInt(num));
+        //     }
 
-            System.out.println("TODOS RECEBERAM O TAMANHO");
+        //     System.out.println("TODOS RECEBERAM O TAMANHO");
 
-            //enviar JSOUPData
-            packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-            try {
-                socket.send(packet);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        //     //enviar JSOUPData
+        //     packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+        //     try {
+        //         socket.send(packet);
+        //     } catch (IOException e) {
+        //         // TODO Auto-generated catch block
+        //         e.printStackTrace();
+        //     }
             
-            hashs = new HashSet<>();
-            number_of_barrels=1;
-            while(hashs.size()!=number_of_barrels){
-                byte buffe[]=new byte[20];
-                DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
+        //     hashs = new HashSet<>();
+        //     number_of_barrels=1;
+        //     while(hashs.size()!=number_of_barrels){
+        //         byte buffe[]=new byte[20];
+        //         DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
                 
-                // try {
-                //     socket.setSoTimeout(10000);
-                // } catch (SocketException e) {
-                //     // TODO Auto-generated catch block
-                //     // e.printStackTrace();
-                // }
+        //         // try {
+        //         //     socket.setSoTimeout(10000);
+        //         // } catch (SocketException e) {
+        //         //     // TODO Auto-generated catch block
+        //         //     // e.printStackTrace();
+        //         // }
     
-                try {
-                    socket.receive(rec);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+        //         try {
+        //             socket.receive(rec);
+        //         } catch (IOException e) {
+        //             // TODO Auto-generated catch block
+        //             e.printStackTrace();
+        //         }
                 
-               String num = new String(rec.getData(), 0, rec.getLength());
-               hashs.add(Integer.parseInt(num));
-            }
+        //        String num = new String(rec.getData(), 0, rec.getLength());
+        //        hashs.add(Integer.parseInt(num));
+        //     }
     
 
-            System.out.println("TODOS RECEBERAM");
-            }
+        //     System.out.println("TODOS RECEBERAM");
+        //     }
 
         }
 

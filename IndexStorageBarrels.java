@@ -78,78 +78,101 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         while(true){
             int tamanho_a_receber=0;
             byte[] buf = new byte[20];
-            DatagramPacket recv = new DatagramPacket(buf, buf.length);
-            try {
-                socket.receive(recv);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            try{
-                String size = new String(recv.getData(), 0, recv.getLength());
-                tamanho_a_receber=Integer.parseInt(size);
-            }
-            catch(NumberFormatException e){
-                e.printStackTrace();
-            }
+            JSOUPData obj=null;
 
-            //enviamos mensagem a dizer que recebemos
-            InetAddress senderAddress = recv.getAddress();
-            int senderPort = recv.getPort();        
-            byte[] sendData = Integer.toString(this.hashCode()).getBytes();
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, senderAddress, senderPort);
-            try {
-                socket.send(sendPacket);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            int opt=-1;
 
-
-            //TODO: temos de mandar uma mensagem com o tamanho da classe que serializamos?
-                //para colocarmos aqui o tamanho certo
-                buf = new byte[tamanho_a_receber];
-                recv = new DatagramPacket(buf, buf.length);
+            //enquanto nao receber a opcao correta le sempre 
+            while(opt!=0){
+                DatagramPacket recv = new DatagramPacket(buf, buf.length);
                 try {
                     socket.receive(recv);
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-    
-    
+
+                //checa opcao
+                opt=buf[0];
                 
-                // String pack = new String(recv.getData(), 0, recv.getLength());
-                // System.out.printf("INFO A INSERIR %s \n",pack);
-    
-                senderAddress = recv.getAddress();
-                senderPort = recv.getPort();
-                // System.out.println("Endereço IP do programa que enviou os dados multicast: " + senderAddress.getHostAddress());
-                // System.out.println("Porta do programa que enviou os dados multicast: " + senderPort);
-                
-                // Crie um pacote de dados para enviar de volta ao remetente
-                sendData = Integer.toString(this.hashCode()).getBytes();
-                sendPacket = new DatagramPacket(sendData, sendData.length, senderAddress, senderPort);
-                try {
-                    socket.send(sendPacket);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                if(opt==0){
+                    byte data[] = new byte [recv.getLength()-1];
+                    System.arraycopy(recv.getData(), 1, data, 0, recv.getLength()-1);
+
+                    try{
+                        String size = new String(data, 0, data.length);
+                        tamanho_a_receber=Integer.parseInt(size);
+                    }
+                    catch(NumberFormatException e){
+                        e.printStackTrace();
+                    }
+
+                    //enviamos mensagem a dizer que recebemos
+                    InetAddress senderAddress = recv.getAddress();
+                    int senderPort = recv.getPort();        
+                    byte[] sendData = Integer.toString(this.hashCode()).getBytes();
+                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, senderAddress, senderPort);
+                    try {
+                        socket.send(sendPacket);
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
-                
-                ByteArrayInputStream bis = new ByteArrayInputStream(buf);
-                ObjectInputStream ois;
-                JSOUPData obj=null;
-                try {
-                    ois = new ObjectInputStream(bis);
-                    obj = (JSOUPData) ois.readObject();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+            }
+
+            System.out.printf("RECEBI O TAMANHO %d", tamanho_a_receber);
+
+            //enquanto nao receber a opcao correta
+            while(opt!=1){
+                //TODO: temos de mandar uma mensagem com o tamanho da classe que serializamos?
+                    //para colocarmos aqui o tamanho certo
+                    buf = new byte[tamanho_a_receber+1];
+                    DatagramPacket recv = new DatagramPacket(buf, buf.length);
+                    try {
+                        socket.receive(recv);
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                    //checa opcao
+                    opt=buf[0];
+
+                    if(opt==1){
+                        byte data[] = new byte [recv.getLength()-1];
+                        System.arraycopy(recv.getData(), 1, data, 0, recv.getLength()-1);
+
+                        InetAddress senderAddress = recv.getAddress();
+                        int senderPort = recv.getPort();
+                        // System.out.println("Endereço IP do programa que enviou os dados multicast: " + senderAddress.getHostAddress());
+                        // System.out.println("Porta do programa que enviou os dados multicast: " + senderPort);
+                        
+                        // Crie um pacote de dados para enviar de volta ao remetente
+                        byte sendData[] = Integer.toString(this.hashCode()).getBytes();
+                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, senderAddress, senderPort);
+                        try {
+                            socket.send(sendPacket);
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        
+                        ByteArrayInputStream bis = new ByteArrayInputStream(data);
+                        ObjectInputStream ois;
+                        try {
+                            ois = new ObjectInputStream(bis);
+                            obj = (JSOUPData) ois.readObject();
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (ClassNotFoundException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
                 }
+
                 
                 if(obj!=null){
                     //indexar info recebida por multicast pelos downloaders

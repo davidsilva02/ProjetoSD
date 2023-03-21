@@ -43,10 +43,10 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
 
     @Override
-    public String resultadoPesquisa(String termo_pesquisa) throws RemoteException {
+    public List<infoURL> resultadoPesquisa(String termo_pesquisa) throws RemoteException {
         System.out.printf("Client pesquisou %s \n",termo_pesquisa);
 
-        String result = pesquisa_barrel(termo_pesquisa);
+        List<infoURL> result = pesquisa_barrel(termo_pesquisa);
         
         return result;
     }
@@ -87,7 +87,6 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
     @Override
     public String getUrl() throws RemoteException {
-    
         
         String newUrl = null;
 
@@ -112,8 +111,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         }
 
     }
-
-
+    
     @Override
     public void AvailableBarrel(BarrelRMI b) throws RemoteException {
         barrels.add(b);
