@@ -43,14 +43,16 @@ public class RMIClient {
                     e.printStackTrace();
                 }
                 break;
-
+            //TODO: AINDA NAO ESTA COMPLETO FALTA AQUILO DAS PAGINAS
             case 2: // MAKE A SEARCH
                 input = sc.nextLine();
                try {
                    List<infoURL> result=server.resultadoPesquisa(input);
-                   
-                   for( infoURL iUrl: result)
-                        System.out.println(iUrl);
+                   if(result!=null){
+                       for( infoURL iUrl: result)
+                            System.out.println(iUrl);
+                   }
+                   else System.out.println("SEM RESULTADOS");
 
                } catch (RemoteException e) {
                    e.printStackTrace();
