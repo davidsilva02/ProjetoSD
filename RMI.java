@@ -5,6 +5,12 @@ import java.util.List;
 
 public interface RMI extends Remote {
 
+    public void makeDownloaderUnavailable(String threadName) throws RemoteException;
+
+    public void makeDownloaderAvailable(String threadName) throws RemoteException;
+
+    public void addDownloader(String threadName) throws RemoteException;
+
     public int makeRegister(String username,String pw) throws RemoteException;
 
     public String makeLogin(String username,String pw) throws RemoteException;

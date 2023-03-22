@@ -4,6 +4,7 @@ import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
@@ -21,6 +22,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     private CopyOnWriteArrayList<BarrelRMI> barrels=new CopyOnWriteArrayList<>();
     private BlockingDeque<String> urlQueue = new LinkedBlockingDeque<>();
     private HashMap<String,Integer> users = new HashMap<>();
+    private HashMap<String,Boolean> system = new HashMap<>(); // IP:NAME, Boolean stands for isActive, (True/False)
     // private ConcurrentLinkedQueue;
 
     public SearchModule() throws RemoteException {
@@ -142,21 +144,65 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
     }
     
+
+    @Override
+    public void addDownloader(String threadName) throws RemoteException {
+        
+
+
+            try {
+                system.put(String.format("%s:%s",getClientHost(),threadName),false);
+                
+                //DEBUG
+                System.out.println("ADD DW "+getClientHost());
+            } catch (ServerNotActiveException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+  
+
+        System.out.println("Downloader disponivel:" + threadName);
+    }
+
+    @Override
+    public void makeDownloaderAvailable(String threadName) throws RemoteException {
+        system.replace(threadName, false);
+    }
+
+    @Override
+    public void makeDownloaderUnavailable(String threadName) throws RemoteException {
+        system.replace(threadName, true);
+    }
+
     @Override
     public void AvailableBarrel(BarrelRMI b) throws RemoteException {
         barrels.add(b);
 
+        try {
+            system.put(String.format("%s:%d",getClientHost(),b.hashCode()),false);
+
+            //DEBUG
+            System.out.println("ADD BARREL "+getClientHost());
+        } catch (ServerNotActiveException e) {
+            e.printStackTrace();
+        }
+
         System.out.println("Barrel disponivel:" + b.hashCode());
     }
 
-
     @Override
     public void notAvailableBarrel(BarrelRMI b) throws RemoteException {
-        // barrels.remove(barrels.indexOf(b));
+        barrels.remove(barrels.indexOf(b));
 
-        // System.out.println("Barrel indisponivel:" + b.hashCode());
+        try {
+            system.remove(String.format("%s:%d",getClientHost(),b.hashCode()));
+        } catch (ServerNotActiveException e) {
+            e.printStackTrace();
+        }
 
+        System.out.println("Barrel indisponivel:" + b.hashCode());
     }
+
 
     @Override
     public String makeLogin(String username,String pw) throws RemoteException{

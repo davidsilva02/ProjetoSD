@@ -32,6 +32,7 @@ public class AnalisadorJSOUP implements Runnable {
     Thread t;
     BlockingQueue<JSOUPData> l;
     Set <String> visited_urls;
+    String threadName;
 
 
     public AnalisadorJSOUP(String threadName,BlockingQueue<JSOUPData> l, Set<String> visited_urls){
@@ -57,6 +58,14 @@ public class AnalisadorJSOUP implements Runnable {
 
         this.l=l;
         this.visited_urls=visited_urls;
+        this.threadName =  threadName;
+
+        try {
+            server.addDownloader(threadName);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        
 
         this.t=new Thread(this,threadName);
         t.start();
@@ -90,6 +99,15 @@ public class AnalisadorJSOUP implements Runnable {
                     //System.out.println("Exception on downloader: " + e.getMessage());
                 }
             }
+
+            try {
+                server.makeDownloaderUnavailable(this.threadName);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+
+
             
             // System.out.printf("O DOWNLOADER COMEÇOU A INDEXAR O URL %s \n",newUrl);
             JSOUPData j=null;
@@ -258,12 +276,17 @@ public class AnalisadorJSOUP implements Runnable {
         //         }
                 
         //        String num = new String(rec.getData(), 0, rec.getLength());
-        //        hashs.add(Integer.parseInt(num));
         //     }
     
 
         //     System.out.println("TODOS RECEBERAM");
         //     }
+        try {
+            server.makeDownloaderAvailable(this.threadName);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
 
         }
 
