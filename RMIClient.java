@@ -2,12 +2,14 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.ExportException;
 import java.util.List;
 import java.util.Scanner;
 
 public class RMIClient {
     Scanner sc;
     RMI server;
+    String loggedUser;
 
     public RMIClient(){
         this.sc=new Scanner(System.in);
@@ -17,6 +19,7 @@ public class RMIClient {
             e.printStackTrace();
             System.exit(0);
         }
+        loggedUser = null;
     }
     public static void main(String[] args) {
         RMIClient c = new RMIClient();
@@ -45,11 +48,55 @@ public class RMIClient {
                 input = sc.nextLine();
                try {
                    List<infoURL> result=server.resultadoPesquisa(input);
-                   System.out.println(result);
                    
+                   for( infoURL iUrl: result)
+                        System.out.println(iUrl);
+
                } catch (RemoteException e) {
                    e.printStackTrace();
                }
+               break;
+
+            case 5: // GET LIST OF PAGES THAT REFERENCE THE RECEIVED URL
+                input = sc.nextLine();
+              try {
+                  List<infoURL> result= server.getReferencesList(input);
+                  System.out.println(result);
+                  
+              } catch (Exception e) {
+                  e.printStackTrace();
+              }
+              break;
+
+           case 7:
+              //GET INTPUT
+              System.out.println("-- Making Login --");
+              System.out.println("Username: ");
+              String username = sc.nextLine();
+              System.out.println("Password: ");
+              String pw = sc.nextLine();
+
+              loggedUser = server.makeLogin(username, pw);
+
+              if(loggedUser == null)
+                System.out.println("Erro. Username ou password inválidos.");
+              else
+                System.out.println("Login efetuado com sucesso!");
+                break;
+
+            case 8:
+                //GET INTPUT
+                System.out.println("-- Registering a new user --");
+                System.out.println("Username: ");
+                String un = sc.nextLine();
+                System.out.println("Password: ");
+                String pass = sc.nextLine();
+
+                if( server.makeRegister(un, pass) == 0 )
+                    System.out.println("Utilizador registado com sucesso!");
+                else
+                    System.out.println("Erro. Utilizador já registado.");
+
                break;
 
            case 0: // CLOSE
@@ -67,6 +114,9 @@ public class RMIClient {
     private int menu(){
        System.out.println("1- Adicionar ULR");
        System.out.println("2- Pesquisar termo");
+       System.out.println("5 - Lista de paginas com ligação a uuma específica");
+       System.out.println("7 - Login");
+       System.out.println("8 - Registo");
        System.out.println("0 PARA SAIR");
 
        int opt=0;

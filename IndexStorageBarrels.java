@@ -271,4 +271,9 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         
         return sortedTermSearch;
     }
+
+    @Override
+    public List<infoURL> resultsReferencesList(String url) throws RemoteException {
+        return new ArrayList<>(this.urls.get(url).getUrls());
+    }
 }

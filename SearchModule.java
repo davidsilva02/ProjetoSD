@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 // import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -18,6 +19,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
     private CopyOnWriteArrayList<BarrelRMI> barrels=new CopyOnWriteArrayList<>();
     private BlockingQueue<String> urlQueue = new LinkedBlockingQueue<>();
+    private HashMap<String,Integer> users = new HashMap<>();
     // private ConcurrentLinkedQueue;
 
 
@@ -59,7 +61,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     public List<infoURL> pesquisa_barrel(String termo_pesquisa){
         List<infoURL> result=null;
         boolean hasValid=false;
-        
+
         // loop through barrels while we can't get an answer
         while (!hasValid){
             //get random barrel from the list
@@ -82,6 +84,36 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
                 }
             }
             return result;
+    }
+
+    public List<infoURL> getReferencesList(String url){
+        	
+        List<infoURL> result=null;
+        boolean hasValid=false;
+
+        // loop through barrels while we can't get an answer
+        while (!hasValid){
+            //get random barrel from the list
+            if(barrels.size()==0) {
+                result=null;
+            }
+
+            BarrelRMI barrel_a_procurar = barrels.get(new Random().nextInt(barrels.size()));
+            
+            try {
+                result = barrel_a_procurar.resultsReferencesList(url);
+                hasValid=true;
+            } catch (RemoteException e) {
+
+                barrels.remove(barrels.indexOf(barrel_a_procurar));
+                if(barrels.size()==0) {
+                    result=null;
+                }
+                e.printStackTrace();
+                }
+            }
+        
+        return result;
     }
 
 
@@ -126,5 +158,26 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
         System.out.println("Barrel indisponivel:" + b.hashCode());
 
+    }
+
+    @Override
+    public String makeLogin(String username,String pw){
+        int hashedRealPw = users.getOrDefault(pw, -1);
+
+        if( hashedRealPw != -1 && hashedRealPw == pw.hashCode())
+            return username;
+
+        return null;
+    }
+    
+    @Override
+    public int makeRegister(String username,String pw){
+        
+        // search for existing user
+        if(  users.get(username) == null)
+            return 1;
+        
+        users.put(username, pw.hashCode());
+        return 0;
     }
 }
