@@ -59,47 +59,55 @@ public class RMIClient {
                }
                break;
 
-            // case 5: // GET LIST OF PAGES THAT REFERENCE THE RECEIVED URL
-            //     input = sc.nextLine();
-            //   try {
-            //       List<infoURL> result= server.getReferencesList(input);
-            //       System.out.println(result);
+            case 5: // GET LIST OF PAGES THAT REFERENCE THE RECEIVED URL
+                input = sc.nextLine();
+              try {
+                  List<infoURL> result= server.getReferencesList(input);
+                  System.out.println(result);
                   
-            //   } catch (Exception e) {
-            //       e.printStackTrace();
-            //   }
-            //   break;
+              } catch (Exception e) {
+                  e.printStackTrace();
+              }
+              break;
 
-        //    case 7:
+           case 7:
               //GET INTPUT
-            //   System.out.println("-- Making Login --");
-            //   System.out.println("Username: ");
-            //   String username = sc.nextLine();
-            //   System.out.println("Password: ");
-            //   String pw = sc.nextLine();
+              System.out.println("-- Making Login --");
+              System.out.println("Username: ");
+              String username = sc.nextLine();
+              System.out.println("Password: ");
+              String pw = sc.nextLine();
 
-            //   loggedUser = server.makeLogin(username, pw);
+                try {
+                    loggedUser = server.makeLogin(username, pw);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
 
-            //   if(loggedUser == null)
-            //     System.out.println("Erro. Username ou password inválidos.");
-            //   else
-            //     System.out.println("Login efetuado com sucesso!");
-            //     break;
+              if(loggedUser == null)
+                System.out.println("Erro. Username ou password inválidos.");
+              else
+                System.out.println("Login efetuado com sucesso!");
+                break;
 
-            // case 8:
-            //     //GET INTPUT
-            //     System.out.println("-- Registering a new user --");
-            //     System.out.println("Username: ");
-            //     String un = sc.nextLine();
-            //     System.out.println("Password: ");
-            //     String pass = sc.nextLine();
+            case 8:
+                //GET INTPUT
+                System.out.println("-- Registering a new user --");
+                System.out.println("Username: ");
+                String un = sc.nextLine();
+                System.out.println("Password: ");
+                String pass = sc.nextLine();
 
-            //     if( server.makeRegister(un, pass) == 0 )
-            //         System.out.println("Utilizador registado com sucesso!");
-            //     else
-            //         System.out.println("Erro. Utilizador já registado.");
+                try {
+                    if( server.makeRegister(un, pass) == 0 )
+                        System.out.println("Utilizador registado com sucesso!");
+                    else
+                        System.out.println("Erro. Utilizador já registado.");
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
 
-            //    break;
+               break;
 
            case 0: // CLOSE
             System.exit(0);
