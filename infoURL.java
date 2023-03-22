@@ -7,6 +7,8 @@ public class infoURL {
     private String title;
     private String citation;
     private HashSet <infoURL> urls= new HashSet<>();
+
+    
     public String getTitle() {
         return title;
     }

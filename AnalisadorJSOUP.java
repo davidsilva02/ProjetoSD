@@ -16,6 +16,7 @@ import org.jsoup.select.Elements;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
@@ -30,9 +31,10 @@ public class AnalisadorJSOUP implements Runnable {
     // String url;
     Thread t;
     BlockingQueue<JSOUPData> l;
+    Set <String> visited_urls;
 
 
-    public AnalisadorJSOUP(String threadName,BlockingQueue<JSOUPData> l){
+    public AnalisadorJSOUP(String threadName,BlockingQueue<JSOUPData> l, Set<String> visited_urls){
         super();
 
         // try {
@@ -54,6 +56,7 @@ public class AnalisadorJSOUP implements Runnable {
         }
 
         this.l=l;
+        this.visited_urls=visited_urls;
 
         this.t=new Thread(this,threadName);
         t.start();
@@ -76,7 +79,13 @@ public class AnalisadorJSOUP implements Runnable {
                 try{
                     //receive new url from the queue on the search module
                     newUrl = server.getUrl();
-                    
+                    //se nao existir, adicionamos que foi visitado
+                    if(!visited_urls.contains(newUrl)) visited_urls.add(newUrl);
+                    //se o url já tiver sido visitado, nao fazemos nada, logo escolhemos outro url
+                    else {
+                        System.out.println("JA VISITOU");
+                        newUrl=null;
+                    }  
                 }catch(Exception e){
                     //System.out.println("Exception on downloader: " + e.getMessage());
                 }

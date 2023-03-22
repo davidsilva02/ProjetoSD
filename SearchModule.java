@@ -11,6 +11,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -18,11 +19,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class SearchModule extends UnicastRemoteObject implements RMI {
 
     private CopyOnWriteArrayList<BarrelRMI> barrels=new CopyOnWriteArrayList<>();
-    private BlockingQueue<String> urlQueue = new LinkedBlockingQueue<>();
+    private BlockingDeque<String> urlQueue = new LinkedBlockingDeque<>();
     private HashMap<String,Integer> users = new HashMap<>();
     // private ConcurrentLinkedQueue;
-
-
 
     public SearchModule() throws RemoteException {
 		super();
@@ -42,8 +41,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 			System.out.println("MalformedURLException in HelloImpl.main: " + e);
 		}*/
     }
-
-
+    
     @Override
     public List<infoURL> resultadoPesquisa(String termo_pesquisa) throws RemoteException {
         System.out.printf("Client pesquisou %s \n",termo_pesquisa);
@@ -154,14 +152,14 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
     @Override
     public void notAvailableBarrel(BarrelRMI b) throws RemoteException {
-        barrels.remove(barrels.indexOf(b));
+        // barrels.remove(barrels.indexOf(b));
 
-        System.out.println("Barrel indisponivel:" + b.hashCode());
+        // System.out.println("Barrel indisponivel:" + b.hashCode());
 
     }
 
     @Override
-    public String makeLogin(String username,String pw){
+    public String makeLogin(String username,String pw) throws RemoteException{
         int hashedRealPw = users.getOrDefault(pw, -1);
 
         if( hashedRealPw != -1 && hashedRealPw == pw.hashCode())
@@ -171,7 +169,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     }
     
     @Override
-    public int makeRegister(String username,String pw){
+    public int makeRegister(String username,String pw) throws RemoteException{
         
         // search for existing user
         if(  users.get(username) == null)
@@ -179,5 +177,26 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         
         users.put(username, pw.hashCode());
         return 0;
+    }
+
+    @Override
+    public int numberBarrels() throws RemoteException {
+        return barrels.size();
+    }
+
+    @Override
+    public void updateBarrels(HashSet<Integer> hashs) throws RemoteException {
+        for (BarrelRMI b: barrels){
+            if(!hashs.contains(b.hashCode())) barrels.remove(b);
+        }
+    }
+
+
+    @Override
+    public void putURLClient(String newUrl) throws RemoteException {
+
+        //adicionar no inicio da lista
+        urlQueue.addFirst(newUrl);
+        
     }
 }

@@ -231,12 +231,12 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
         //marca barrel como ocupado
         //envia ao server que o barrel ja nao esta disponivel
-        try {
-            server.notAvailableBarrel(this);
-        } catch (RemoteException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        // try {
+        //     server.notAvailableBarrel(this);
+        // } catch (RemoteException e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
 
         // procurar pelo termo
         List<infoURL> sortedTermSearch = null;

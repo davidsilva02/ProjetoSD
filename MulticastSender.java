@@ -5,6 +5,8 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.MulticastSocket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -53,6 +55,16 @@ public class MulticastSender implements Runnable {
 
     @Override
     public void run() {
+        //primeira vez saca os barrels que tens
+        int number_of_barrels;
+        try {
+            number_of_barrels = searchModule.numberBarrels();
+        } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            number_of_barrels=-1;
+            e.printStackTrace();
+        }
+
         while(true){
             try {
                 JSOUPData j = l.take();
@@ -93,30 +105,78 @@ public class MulticastSender implements Runnable {
                 //TODO: abordagem ainda nao esta completa, temos de saber quantos barrels temos, e a busca por resposta tem de ter limites (??)
                 //esperamos que todos recebam o tamanho
                 HashSet<Integer> hashs = new HashSet<>();
-                int number_of_barrels=1;
-                while(hashs.size()!=number_of_barrels){
+                //buscar barrels
+                for (int i=0;i<number_of_barrels;i++){
                     byte buffe[]=new byte[20];
                     DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
-                    
-                    // try {
-                    //     socket.setSoTimeout(10000);
-                    // } catch (SocketException e) {
-                    //     // TODO Auto-generated catch block
-                    //     // e.printStackTrace();
-                    // }
-        
                     try {
-                        socket.receive(rec);
-                    } catch (IOException e) {
+                        socket.setSoTimeout(1000);
+                        try {
+                            socket.receive(rec);
+                            String num = new String(rec.getData(), 0, rec.getLength());
+                            hashs.add(Integer.parseInt(num));
+                        } catch (SocketTimeoutException e) {
+                            //e.printStackTrace();
+                        } catch (IOException e) {
+                            //e.printStackTrace();
+                        }
+                    } catch (SocketException e) {
+                        // TODO Auto-generated catch block
+                        // e.printStackTrace();
+                    }
+                }
+
+                if(hashs.size() != number_of_barrels){
+                    int  barrels_faltam = number_of_barrels - hashs.size();
+                    //System.out.printf("FALTAM %d CONFIRMACOES", barrels_faltam);
+                    //confirmação de barrels que faltam
+                    int numero_tentativas=1;
+                    for(int i=0;i<numero_tentativas;i++){
+                        //enviar de novo novamente
+                        packet = new DatagramPacket(send, send.length, group, PORT);
+                        try {
+                        socket.send(packet);
+                        } catch (IOException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
+                        }
+
+                        //esperamos pelas respostas dos barrels que faltam
+                        for (int h=0;h<barrels_faltam;h++){
+                            byte buffe[]=new byte[20];
+                            DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
+
+                            try {
+                                socket.setSoTimeout(1000);
+                                try {
+                                    socket.receive(rec);
+                                    String num = new String(rec.getData(), 0, rec.getLength());
+                                    hashs.add(Integer.parseInt(num));
+                                } catch (SocketTimeoutException e) {
+                                    //e.printStackTrace();
+                                } catch (IOException e) {
+                                    //e.printStackTrace();
+                                }
+                            } catch (SocketException e) {
+                                // TODO Auto-generated catch block
+                                // e.printStackTrace();
+                            }
+                        }
                     }
-                    
-                   String num = new String(rec.getData(), 0, rec.getLength());
-                   hashs.add(Integer.parseInt(num));
+
+                    if(hashs.size()!=number_of_barrels){
+                        //enviamos para o server as respostas que recebemos
+                       //enviamos para o server as respostas que recebemos
+                       try {
+                        searchModule.updateBarrels(hashs);
+                        number_of_barrels=number_of_barrels-(number_of_barrels - hashs.size());
+                        } catch (RemoteException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
                 }
                 
-
                 System.out.printf("TODOS RECEBERAM O TAMANHO %d \n", tamanho_envio);
     
                 //enviar JSOUPData com opcao 1
@@ -134,26 +194,74 @@ public class MulticastSender implements Runnable {
                 }
                 
                 hashs = new HashSet<>();
-                number_of_barrels=1;
-                while(hashs.size()!=number_of_barrels){
+                for (int i=0;i<number_of_barrels;i++){
                     byte buffe[]=new byte[20];
                     DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
-                    
-                    // try {
-                    //     socket.setSoTimeout(10000);
-                    // } catch (SocketException e) {
-                    //     // TODO Auto-generated catch block
-                    //     // e.printStackTrace();
-                    // }
-        
                     try {
-                        socket.receive(rec);
-                    } catch (IOException e) {
+                        socket.setSoTimeout(1000);
+                        try {
+                            socket.receive(rec);
+                            String num = new String(rec.getData(), 0, rec.getLength());
+                            hashs.add(Integer.parseInt(num));
+                        } catch (SocketTimeoutException e) {
+                            //e.printStackTrace();
+                        } catch (IOException e) {
+                            //e.printStackTrace();
+                        }
+                    } catch (SocketException e) {
+                        // TODO Auto-generated catch block
+                        // e.printStackTrace();
+                    }
+                }
+
+                if(hashs.size() != number_of_barrels){
+                    int  barrels_faltam = number_of_barrels - hashs.size();
+                    //System.out.printf("FALTAM %d CONFIRMACOES", barrels_faltam);
+                    //confirmação de barrels que faltam
+                    int numero_tentativas=1;
+                    for(int i=0;i<numero_tentativas;i++){
+                        //enviar de novo novamente
+                        packet = new DatagramPacket(send, send.length, group, PORT);
+                        try {
+                        socket.send(packet);
+                        } catch (IOException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
+                        }
+
+                        //esperamos pelas respostas dos barrels que faltam
+                        for (int h=0;h<barrels_faltam;h++){
+                                byte buffe[]=new byte[20];
+                                DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
+                                try {
+                                    socket.setSoTimeout(1000);
+                                    try {
+                                        socket.receive(rec);
+                                        String num = new String(rec.getData(), 0, rec.getLength());
+                                        hashs.add(Integer.parseInt(num));
+                                    } catch (SocketTimeoutException e) {
+                                        //e.printStackTrace();
+                                    } catch (IOException e) {
+                                        //e.printStackTrace();
+                                    }
+                                } catch (SocketException e) {
+                                    // TODO Auto-generated catch block
+                                    // e.printStackTrace();
+                                }
+                        }
                     }
-                   String num = new String(rec.getData(), 0, rec.getLength());
-                   hashs.add(Integer.parseInt(num));
+
+                    if(hashs.size()!=number_of_barrels){
+                        //enviamos para o server as respostas que recebemos
+                        try {
+                            searchModule.updateBarrels(hashs);
+                            number_of_barrels=number_of_barrels-(number_of_barrels - hashs.size());
+                        } catch (RemoteException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                    }
                 }
 
                 System.out.println("TODOS OS BARRELS RECEBERAM A CLASSE");
