@@ -262,12 +262,12 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         // else result="SEM RESULTADOS";
 
         //marca barrel como disponivel
-        try {
-            server.AvailableBarrel(this);
-        } catch (RemoteException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        // try {
+        //     server.AvailableBarrel(this);
+        // } catch (RemoteException e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
         
         return sortedTermSearch;
     }
