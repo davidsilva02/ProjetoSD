@@ -23,6 +23,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     private BlockingDeque<String> urlQueue = new LinkedBlockingDeque<>();
     private HashMap<String,Integer> users = new HashMap<>();
     private HashMap<String,Boolean> system = new HashMap<>(); // IP:NAME, Boolean stands for isActive, (True/False)
+
     // private ConcurrentLinkedQueue;
 
     public SearchModule() throws RemoteException {
@@ -206,7 +207,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
     @Override
     public String makeLogin(String username,String pw) throws RemoteException{
-        int hashedRealPw = users.getOrDefault(pw, -1);
+        int hashedRealPw = users.getOrDefault(username, -1);
 
         if( hashedRealPw != -1 && hashedRealPw == pw.hashCode())
             return username;
@@ -218,7 +219,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     public int makeRegister(String username,String pw) throws RemoteException{
         
         // search for existing user
-        if(  users.get(username) == null)
+        if(  users.get(username) != null)
             return 1;
         
         users.put(username, pw.hashCode());
