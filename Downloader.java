@@ -48,7 +48,7 @@ public class Downloader{
         new MulticastSender("MS", this.l);
 
         //TODO: Colocar por argumento o numero de threads a criar
-        for(int i = 0; i < Integer.parseInt("20"); i++) {
+        for(int i = 0; i < Integer.parseInt("10"); i++) {
            new  AnalisadorJSOUP("Downloader" + Integer.toString(i), l,visited_urls);
         }
         

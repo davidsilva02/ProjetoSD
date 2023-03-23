@@ -70,7 +70,16 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
                 result=null;
             }
 
-            BarrelRMI barrel_a_procurar = barrels.get(new Random().nextInt(barrels.size()));
+            Boolean flag=false;
+            BarrelRMI barrel_a_procurar =null;
+            while(flag==false){
+            try{
+                barrel_a_procurar= barrels.get(new Random().nextInt(barrels.size()));
+                flag=true;
+            }
+            catch(IllegalArgumentException e){
+                
+            }}
             
             try {
                 result = barrel_a_procurar.resultadoPesquisa(termo_pesquisa);

@@ -83,6 +83,8 @@ public class AnalisadorJSOUP implements Runnable {
             newUrl = null;
             ack = false;
             
+            //DEBUG
+            // if(visited_urls.size()==2) break;
             //ir buscar URL à queue
             while(newUrl == null){
                 try{
@@ -120,8 +122,14 @@ public class AnalisadorJSOUP implements Runnable {
 
                 Document doc = Jsoup.connect(newUrl).get();
                 String title = doc.title();
-                //so para testar citacao
-                String citation=doc.text().substring(0,5);
+                String citation =null;
+                try{
+                    citation=doc.text().substring(0,50);
+                    citation+="...";
+                }
+                catch(StringIndexOutOfBoundsException e){
+                    citation=doc.text();
+                }
                 
                 StringTokenizer tokens = new StringTokenizer(doc.text());
                 j=new JSOUPData(title, newUrl, citation);

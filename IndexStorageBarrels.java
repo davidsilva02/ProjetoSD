@@ -176,16 +176,17 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 
                 if(obj!=null){
                     //indexar info recebida por multicast pelos downloaders
+                    infoURL urlAtual=null;
                     String url=obj.getUrl();
                     System.out.println("A indexar o objeto com url " + url);
                     String title=obj.getTitle();
                     String citation=obj.getCitation();
-                    List <String> termos = obj.getTermos();
-                    List <String> hip = obj.getHip();
+                    HashSet <String> termos = obj.getTermos();
+                    HashSet <String> hip = obj.getHip();
         
-                    infoURL urlAtual=null;
                     if(!urls.containsKey(url)){
                         urlAtual=new infoURL(url,title, citation);
+                        urls.put(url, urlAtual);
                     }
                     else {
                         urlAtual=urls.get(url);
@@ -208,7 +209,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                     
                     for (String hipString : hip){
                         if(!urls.containsKey(hipString)){
-                            infoURL info = new infoURL(url);
+                            infoURL info = new infoURL(hipString);
                             info.addURL(urlAtual);
                             urls.put(hipString,info);
                         }

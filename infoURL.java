@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class infoURL {
+public class infoURL implements Serializable {
     private String url;
     private String title;
     private String citation;
@@ -50,10 +51,8 @@ public class infoURL {
         this.urls = urls;
     }
 
-    @Override //TODO fazer um toString direito para facilitar o print dos links no cliente
+    @Override
     public String toString() {
-        return null;
+        return String.format("Titulo: %s\nURL: %s\nCitation: %s\n",title,url,citation);
     }
-
-    
 }

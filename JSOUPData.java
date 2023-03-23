@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 /**
@@ -10,15 +11,15 @@ public class JSOUPData implements Serializable{
     private String title;
     private String url;
     private String citation; //TODO trocar por 1 objeto infoURL?
-    private List<String> termos;
-    private List <String> hip;
+    private HashSet<String> termos;
+    private HashSet <String> hip;
     
     public JSOUPData(String title, String url, String citation) {
         this.title = title;
         this.url = url;
         this.citation = citation;
-        this.termos=new ArrayList<>();
-        this.hip=new ArrayList<>();
+        this.termos=new HashSet<>();
+        this.hip=new HashSet<>();
     }
 
 
@@ -49,16 +50,16 @@ public class JSOUPData implements Serializable{
     public void setCitation(String citation) {
         this.citation = citation;
     }
-    public List<String> getTermos() {
+    public HashSet<String> getTermos() {
         return termos;
     }
-    public void setTermos(List<String> termos) {
+    public void setTermos(HashSet<String> termos) {
         this.termos = termos;
     }
-    public List<String> getHip() {
+    public HashSet<String> getHip() {
         return hip;
     }
-    public void setHip(List<String> hip) {
+    public void setHip(HashSet<String> hip) {
         this.hip = hip;
     }
 
