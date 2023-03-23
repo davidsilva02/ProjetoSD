@@ -22,7 +22,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     private CopyOnWriteArrayList<BarrelRMI> barrels=new CopyOnWriteArrayList<>();
     private BlockingDeque<String> urlQueue = new LinkedBlockingDeque<>();
     private HashMap<String,Integer> users = new HashMap<>();
-    private HashMap<String,Boolean> system = new HashMap<>(); // IP:NAME, Boolean stands for isAvailable, (True/False)
+    private HashMap<String,Component> system = new HashMap<>(); // IP:NAME, Boolean stands for isAvailable, (True/False)
 
     // private ConcurrentLinkedQueue;
 
@@ -175,10 +175,11 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
 
             try {
-                system.put(String.format("%s:%s",getClientHost(),threadName),false);
+                Component newComp = new Component(getClientHost(),false);
+                system.put(threadName,newComp);
                 
                 //DEBUG
-                System.out.println("ADD DW "+getClientHost());
+                System.out.println("ADD DW " + getClientHost() + ":" + threadName);
             } catch (ServerNotActiveException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -190,12 +191,12 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
     @Override
     public void makeDownloaderAvailable(String threadName) throws RemoteException {
-        system.replace(threadName, true);
+        system.replace(threadName, new Component(system.get(threadName).getIp(), true));
     }
 
     @Override
     public void makeDownloaderUnavailable(String threadName) throws RemoteException {
-        system.replace(threadName, false);
+        system.replace(threadName, new Component(system.get(threadName).getIp(), false));
     }
 
     @Override
@@ -203,7 +204,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         barrels.add(b);
 
         try {
-            system.put(String.format("%s:%d",getClientHost(),b.hashCode()),true);
+            system.put(String.format("%s",b.hashCode()),new Component(getClientHost(), true));
 
             //DEBUG
             System.out.println("ADD BARREL "+getClientHost());
@@ -218,11 +219,8 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     public void notAvailableBarrel(BarrelRMI b) throws RemoteException {
         barrels.remove(barrels.indexOf(b));
 
-        try {
-            system.replace(String.format("%s:%d",getClientHost(),b.hashCode()),false);
-        } catch (ServerNotActiveException e) {
-            e.printStackTrace();
-        }
+        system.replace(Integer.toString(b.hashCode()), new Component( system.get(Integer.toString(b.hashCode())).getIp() , false) );
+ 
 
         System.out.println("Barrel indisponivel:" + b.hashCode());
     }
@@ -257,7 +255,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     @Override
     public void updateBarrels(HashSet<Integer> hashs) throws RemoteException {
         for (BarrelRMI b: barrels){
-            if(!hashs.contains(b.hashCode())) barrels.remove(b);
+            if(!hashs.contains(b.hashCode())) notAvailableBarrel(b);;
         }
     }
 
@@ -270,7 +268,9 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         
     }
 
-    public HashMap<String,Boolean> getComponents() throws RemoteException {
+    public HashMap<String,Component> getComponents() throws RemoteException {
+        System.out.println("GET COMPONENTS");
+
         return this.system;
     }
 

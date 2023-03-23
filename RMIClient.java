@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
+
 public class RMIClient {
     Scanner sc;
     RMI server;
@@ -73,23 +74,21 @@ public class RMIClient {
 
             case 6: // STATUS
                 try {
-                    HashMap<String,Boolean> components = server.getComponents();
+                    HashMap<String,Component> components = server.getComponents();
                     // List<> topSearchs = server.getTopSearchs();
+                    Component currentComp;
 
                     for(String key : components.keySet()){
+                        currentComp = components.get(key);
 
-                        String[] getParts = key.split(":");
-                        String ip = getParts[0];
-                        String name = getParts[1];
-
-                        if(Character.isDigit(name.charAt(0))){
+                        if(Character.isDigit(key.charAt(0))){
                             // BARREL
-                            System.out.println(String.format("Type: Barrel | Hash: %s | IP: %s | Available: %b", name, ip, components.get(key)));
+                            System.out.println(String.format("Type: Barrel | Hash: %s | IP: %s | Available: %b", key, currentComp.getIp(), currentComp.getIsAvailable()));
 
                         }
                         else{
                             // DOWNLOADER
-                            System.out.println(String.format("Type: Downloader | Name: %s | IP: %s | Available: %b", name,ip, components.get(key));
+                            System.out.println(String.format("Type: Downloader | Name: %s | IP: %s | Available: %b", key, currentComp.getIp(), currentComp.getIsAvailable()));
 
                         }
                     }

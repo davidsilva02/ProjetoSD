@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface RMI extends Remote {
 
-    public HashMap<String,Boolean> getComponents() throws RemoteException;
+    public HashMap<String,Component> getComponents() throws RemoteException;
 
     public void makeDownloaderUnavailable(String threadName) throws RemoteException;
 
