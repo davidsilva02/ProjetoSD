@@ -22,7 +22,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     private CopyOnWriteArrayList<BarrelRMI> barrels=new CopyOnWriteArrayList<>();
     private BlockingDeque<String> urlQueue = new LinkedBlockingDeque<>();
     private HashMap<String,Integer> users = new HashMap<>();
-    private HashMap<String,Boolean> system = new HashMap<>(); // IP:NAME, Boolean stands for isActive, (True/False)
+    private HashMap<String,Boolean> system = new HashMap<>(); // IP:NAME, Boolean stands for isAvailable, (True/False)
 
     // private ConcurrentLinkedQueue;
 
@@ -77,7 +77,14 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
                 hasValid=true;
             } catch (RemoteException e) {
 
-                barrels.remove(barrels.indexOf(barrel_a_procurar));
+                try {
+                    notAvailableBarrel(barrel_a_procurar);
+                } catch (RemoteException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } // TROQUEI PARA SER MAIS GENERICO E TIRAR DOS COMPONENTES
+                // barrels.remove(barrels.indexOf(barrel_a_procurar));
+
                 if(barrels.size()==0) {
                     result=null;
                 }
@@ -106,7 +113,14 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
                 hasValid=true;
             } catch (RemoteException e) {
 
-                barrels.remove(barrels.indexOf(barrel_a_procurar));
+                try {
+                    notAvailableBarrel(barrel_a_procurar);
+                } catch (RemoteException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } // TROQUEI PARA SER MAIS GENERICO E TIRAR DOS COMPONENTES
+                // barrels.remove(barrels.indexOf(barrel_a_procurar));
+                
                 if(barrels.size()==0) {
                     result=null;
                 }
@@ -167,12 +181,12 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
     @Override
     public void makeDownloaderAvailable(String threadName) throws RemoteException {
-        system.replace(threadName, false);
+        system.replace(threadName, true);
     }
 
     @Override
     public void makeDownloaderUnavailable(String threadName) throws RemoteException {
-        system.replace(threadName, true);
+        system.replace(threadName, false);
     }
 
     @Override
@@ -180,7 +194,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         barrels.add(b);
 
         try {
-            system.put(String.format("%s:%d",getClientHost(),b.hashCode()),false);
+            system.put(String.format("%s:%d",getClientHost(),b.hashCode()),true);
 
             //DEBUG
             System.out.println("ADD BARREL "+getClientHost());
@@ -196,7 +210,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         barrels.remove(barrels.indexOf(b));
 
         try {
-            system.remove(String.format("%s:%d",getClientHost(),b.hashCode()));
+            system.replace(String.format("%s:%d",getClientHost(),b.hashCode()),false);
         } catch (ServerNotActiveException e) {
             e.printStackTrace();
         }
@@ -246,4 +260,10 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         urlQueue.addFirst(newUrl);
         
     }
+
+    public HashMap<String,Boolean> getComponents() throws RemoteException {
+        return this.system;
+    }
+
+    // public List???? getTopSearchs() throws RemoteException {}
 }

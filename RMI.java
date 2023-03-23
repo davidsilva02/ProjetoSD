@@ -1,9 +1,12 @@
 
 import java.rmi.*;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 public interface RMI extends Remote {
+
+    public HashMap<String,Boolean> getComponents() throws RemoteException;
 
     public void makeDownloaderUnavailable(String threadName) throws RemoteException;
 

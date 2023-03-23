@@ -3,6 +3,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -68,6 +69,38 @@ public class RMIClient {
               }
               break;
 
+            case 6: // STATUS
+                try {
+                    HashMap<String,Boolean> components = server.getComponents();
+                    // List<> topSearchs = server.getTopSearchs();
+
+                    for(String key : components.keySet()){
+
+                        String[] getParts = key.split(":");
+                        String ip = getParts[0];
+                        String name = getParts[1];
+
+                        if(Character.isDigit(name.charAt(0))){
+                            // BARREL
+                            System.out.println(String.format("Type: Barrel | Hash: %s | IP: %s | Available: %b", name, ip, components.get(key)));
+
+                        }
+                        else{
+                            // DOWNLOADER
+                            System.out.println(String.format("Type: Downloader | Name: %s | IP: %s | Available: %b", name,ip, components.get(key));
+
+                        }
+                    }
+                    
+                    // for(String termo: topSearchs){}
+
+                    // System.out.println(result);
+                    
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+
            case 7:
               //GET INTPUT
               System.out.println("-- Making Login --");
@@ -121,7 +154,8 @@ public class RMIClient {
     private int menu(){
        System.out.println("1- Adicionar ULR");
        System.out.println("2- Pesquisar termo");
-       System.out.println("5 - Lista de paginas com ligação a uuma específica");
+       System.out.println("5 - Lista de paginas com ligação a uma específica");
+       System.out.println("6 - Estatísticas");
        System.out.println("7 - Login");
        System.out.println("8 - Registo");
        System.out.println("0 PARA SAIR");
