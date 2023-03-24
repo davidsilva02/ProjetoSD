@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeMap;
 
 public interface RMI extends Remote {
+
+    public ArrayList<Searched> getTopSearchs() throws RemoteException;
 
     public HashMap<String,Component> getComponents() throws RemoteException;
 

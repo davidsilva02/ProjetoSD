@@ -13,10 +13,14 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NavigableSet;
+import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class SearchModule extends UnicastRemoteObject implements RMI {
@@ -25,6 +29,9 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     private BlockingDeque<String> urlQueue = new LinkedBlockingDeque<>();
     private HashMap<String,Integer> users = new HashMap<>();
     private HashMap<String,Component> system = new HashMap<>(); // IP:NAME, Boolean stands for isAvailable, (True/False)
+    private ArrayList<Searched> searches = new ArrayList<>();
+
+    // private ConcurrentLinkedQueue;
 
     public SearchModule() throws RemoteException {
 		super();
@@ -45,9 +52,45 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 		}*/
     }
     
+    public boolean containsTerm(String term){
+        return searches.stream().anyMatch(o -> o.getTerm().equals(term));
+    }
+
     @Override
     synchronized public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa,Integer id_client) throws RemoteException {
         System.out.printf("Client pesquisou %s \n",termo_pesquisa);
+
+        //add to the searched terms list
+        Searched newTerm = new Searched(1,termo_pesquisa);
+
+        if( searches.contains(newTerm) ){
+            
+            //get the current term and update the number of searches for the term
+            Searched updatedTerm = searches.get(searches.indexOf(newTerm));
+            updatedTerm.setNumSearches( updatedTerm.getNumSearches() + 1);
+            searches.set(searches.indexOf(newTerm),updatedTerm);
+        }
+        else
+            searches.add(newTerm);
+
+        searches.sort(Comparator.comparing(Searched::getNumSearches));
+
+
+        //add to the searched terms list
+        newTerm = new Searched(1,termo_pesquisa);
+
+        if( searches.contains(newTerm) ){
+            
+            //get the current term and update the number of searches for the term
+            Searched updatedTerm = searches.get(searches.indexOf(newTerm));
+            updatedTerm.setNumSearches( updatedTerm.getNumSearches() + 1);
+            searches.set(searches.indexOf(newTerm),updatedTerm);
+        }
+        else
+            searches.add(newTerm);
+
+        searches.sort(Comparator.comparing(Searched::getNumSearches));
+
 
         ArrayList<infoURL> result = pesquisa_barrel(termo_pesquisa,id_client);
         
@@ -177,7 +220,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
 
             try {
-                Component newComp = new Component(getClientHost(),false);
+                Component newComp = new Component(getClientHost(),true);
                 system.put(threadName,newComp);
                 
                 //DEBUG
@@ -308,4 +351,15 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     }
 
     // public List???? getTopSearchs() throws RemoteException {}
+    synchronized public ArrayList<Searched> getTopSearchs() throws RemoteException {
+        System.out.println("GET TOP SEARCHS");
+
+        if (searches.size() >= 10)
+            return new ArrayList<Searched>(searches.subList(0, 10));
+        else{
+            System.out.println("SMALL SIZE");
+            return new ArrayList<Searched>(searches.subList(0, searches.size()));
+
+        }
+    }
 }
