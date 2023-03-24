@@ -254,7 +254,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 numReferences.add( urls.get(newUrl.getUrl()).getUrls().size() );
             }
 
-
+            // TODO ERRADO??!?!?!?
             //ordenar os links da pesquisa pelo nr de referencias
             sortedTermSearch = new ArrayList<>(termSearch);
             sortedTermSearch.sort(Comparator.comparing(infoURL::numeroURL));   

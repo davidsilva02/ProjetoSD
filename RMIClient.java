@@ -2,10 +2,11 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.server.ExportException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+
 
 
 public class RMIClient {
@@ -72,16 +73,17 @@ public class RMIClient {
               }
               break;
 
-            case 6: // STATUS
+            case 6: // STATUS2
                 try {
                     HashMap<String,Component> components = server.getComponents();
-                    // List<> topSearchs = server.getTopSearchs();
+                    ArrayList<Searched> topSearchs = server.getTopSearchs();
+
                     Component currentComp;
 
                     for(String key : components.keySet()){
                         currentComp = components.get(key);
 
-                        if(Character.isDigit(key.charAt(0))){
+                        if(Character.isDigit(key.charAt(1))){
                             // BARREL
                             System.out.println(String.format("Type: Barrel | Hash: %s | IP: %s | Available: %b", key, currentComp.getIp(), currentComp.getIsAvailable()));
 
@@ -93,7 +95,10 @@ public class RMIClient {
                         }
                     }
                     
-                    // for(String termo: topSearchs){}
+                    System.out.println(" -- Top Searches -- ");
+                    for(Searched searchObj: topSearchs)
+                        System.out.println(String.format("%d - %s", searchObj.getNumSearches(), searchObj.getTerm()));
+                    
 
                     // System.out.println(result);
                     
