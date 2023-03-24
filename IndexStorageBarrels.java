@@ -28,6 +28,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     RMI server;
     ConcurrentHashMap<String,HashSet<infoURL>> ind; // termo: LINKS QUE CONTÉM O TERMO
     ConcurrentHashMap<String,infoURL> urls; // fatherUrl: LISTA DE URLS QUE FAZEM REFERENCIA PARA O fatherUrl
+    ConcurrentHashMap <Integer,ArrayList<infoURL>> resultados_pesquisa;
 
 
     public IndexStorageBarrels() throws RemoteException{
@@ -35,6 +36,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
         this.ind= new ConcurrentHashMap<>();
         this.urls= new ConcurrentHashMap<>();
+        this.resultados_pesquisa=new ConcurrentHashMap<>();
 
         try {
             this.socket=new MulticastSocket(PORT);
@@ -227,9 +229,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     }
 
     @Override
-    public List<infoURL> resultadoPesquisa(String termo_pesquisa) throws RemoteException {
-        String result;
-
+    synchronized public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa, Integer id_client) throws RemoteException {
         //marca barrel como ocupado
         //envia ao server que o barrel ja nao esta disponivel
         // try {
@@ -240,24 +240,22 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         // }
 
         // procurar pelo termo
-        List<infoURL> sortedTermSearch = null;
-        HashSet<infoURL> termSearch = ind.get(termo_pesquisa);
+        ArrayList<infoURL> sortedTermSearch = null;
+        HashSet<infoURL> termSearch = ind.get(termo_pesquisa.toLowerCase());
         
         // se encontrarmos o termo
         if( termSearch != null ) {
-            List<Integer> numReferences = new ArrayList<Integer>();
+            //ordenar os links da pesquisa pelo nr de referencias
+            sortedTermSearch = new ArrayList<infoURL>(termSearch);
+            sortedTermSearch.sort(Comparator.comparing(infoURL::numeroURL));   
 
-            // iterar os urls relativos ao termo encontrado
-            for(infoURL newUrl: termSearch){
-    
-                // ir buscar o numero de urls que fazem referencia para cada URL do termo (posterior ordenacao)
-                numReferences.add( urls.get(newUrl.getUrl()).getUrls().size() );
+            //nao existem mais paginas
+            if(sortedTermSearch.size()<=10) sortedTermSearch.add(new infoURL("fim"));
+            else{
+                resultados_pesquisa.put(id_client, new ArrayList<infoURL>(sortedTermSearch.subList(10, sortedTermSearch.size())));
+                sortedTermSearch=new ArrayList<infoURL>(sortedTermSearch.subList(0, 10));
             }
 
-
-            //ordenar os links da pesquisa pelo nr de referencias
-            sortedTermSearch = new ArrayList<>(termSearch);
-            sortedTermSearch.sort(Comparator.comparing(infoURL::numeroURL));   
         }
         // if(termo_pesquisa.equals("ABC")) result="COM RESULTADOS";
         // else result="SEM RESULTADOS";
@@ -274,7 +272,25 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     }
 
     @Override
-    public List<infoURL> resultsReferencesList(String url) throws RemoteException {
+    public ArrayList<infoURL> resultsReferencesList(String url) throws RemoteException {
         return new ArrayList<>(this.urls.get(url).getUrls());
+    }
+
+    @Override
+    synchronized public ArrayList<infoURL> continueSearch(Integer id_client) throws RemoteException{
+        if(resultados_pesquisa.containsKey(id_client)){
+            ArrayList<infoURL> l =resultados_pesquisa.get(id_client);
+            ArrayList<infoURL> res=new ArrayList<infoURL>( l.subList(0, Math.min(10,l.size())));
+            if(l.size()>10) resultados_pesquisa.put(id_client, new ArrayList<infoURL> (l.subList(Math.min(10,l.size()),l.size())));
+            else {
+                res.add(new infoURL("fim"));
+                //remover id_client da pesquisa
+                resultados_pesquisa.remove(id_client);
+            }
+
+            return res;
+        }
+
+        else return null;
     }
 }

@@ -1,5 +1,6 @@
 
 import java.rmi.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,9 +19,9 @@ public interface RMI extends Remote {
 
     public String makeLogin(String username,String pw) throws RemoteException;
 
-	public List<infoURL> resultadoPesquisa(String termo_pesquisa) throws java.rmi.RemoteException;
+	public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa, Integer id_client) throws java.rmi.RemoteException;
 
-    public List<infoURL> getReferencesList(String url) throws RemoteException;
+    public ArrayList<infoURL> getReferencesList(String url) throws RemoteException;
     
     public void AvailableBarrel(BarrelRMI b) throws java.rmi.RemoteException;
 
@@ -35,4 +36,6 @@ public interface RMI extends Remote {
     public int numberBarrels() throws RemoteException;
     
     public void updateBarrels(HashSet<Integer> hashs) throws RemoteException;
+
+    public ArrayList<infoURL> continueSearching(Integer id_client, Integer hash_barrel) throws RemoteException;
 }
