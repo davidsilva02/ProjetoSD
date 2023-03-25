@@ -26,10 +26,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class SearchModule extends UnicastRemoteObject implements RMI {
 
     private CopyOnWriteArrayList<BarrelRMI> barrels=new CopyOnWriteArrayList<>();
-    private BlockingDeque<String> urlQueue = new LinkedBlockingDeque<>();
+    // private BlockingDeque<String> urlQueue = new LinkedBlockingDeque<>();
     private HashMap<String,Integer> users = new HashMap<>();
     private HashMap<String,Component> system = new HashMap<>(); // IP:NAME, Boolean stands for isAvailable, (True/False)
     private ArrayList<Searched> searches = new ArrayList<>();
+    DownloaderRMI dwRMI;
 
     // private ConcurrentLinkedQueue;
 
@@ -40,16 +41,26 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     
     public static void main(String[] args) {
         System.out.println("SERVER A CORRER");
-
+        
+        // Open server RMI
+        SearchModule h = null;
 		try {
-			SearchModule h = new SearchModule();
+            h = new SearchModule();
 			LocateRegistry.createRegistry(1099).rebind("server", h);
 			System.out.println("RMI SERVER ready.");
 		} catch (RemoteException re) {
 			System.out.println("Exception in RMISERVER.main: " + re);
+            System.exit(1);
 		} /*catch (MalformedURLException e) {
 			System.out.println("MalformedURLException in HelloImpl.main: " + e);
 		}*/
+
+    }
+
+    @Override
+    public void connectDwRMItoServer(DownloaderRMI ref) throws RemoteException{
+        // Get reference for the Downloader RMI
+        this.dwRMI = ref;
     }
     
     public boolean containsTerm(String term){
@@ -62,22 +73,6 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
         //add to the searched terms list
         Searched newTerm = new Searched(1,termo_pesquisa);
-
-        if( searches.contains(newTerm) ){
-            
-            //get the current term and update the number of searches for the term
-            Searched updatedTerm = searches.get(searches.indexOf(newTerm));
-            updatedTerm.setNumSearches( updatedTerm.getNumSearches() + 1);
-            searches.set(searches.indexOf(newTerm),updatedTerm);
-        }
-        else
-            searches.add(newTerm);
-
-        searches.sort(Comparator.comparing(Searched::getNumSearches));
-
-
-        //add to the searched terms list
-        newTerm = new Searched(1,termo_pesquisa);
 
         if( searches.contains(newTerm) ){
             
@@ -186,32 +181,32 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     }
 
 
-    @Override
-    public String getUrl() throws RemoteException {
+    // @Override
+    // public String getUrl() throws RemoteException {
         
-        String newUrl = null;
+    //     String newUrl = null;
 
-        while( newUrl == null ){
-            try{
-                newUrl = urlQueue.take();
-                urlQueue.remove(newUrl);
-            }catch(InterruptedException e){
-                System.out.println("Exception taking an url from the queue: " +  e);
-            }
-        }
+    //     while( newUrl == null ){
+    //         try{
+    //             newUrl = urlQueue.take();
+    //             urlQueue.remove(newUrl);
+    //         }catch(InterruptedException e){
+    //             System.out.println("Exception taking an url from the queue: " +  e);
+    //         }
+    //     }
 
-        return newUrl;
-    }
+    //     return newUrl;
+    // }
 
-    @Override
-    public void putUrl(String newUrl) throws RemoteException {
-        try{
-            urlQueue.add(newUrl);
-        }catch(IllegalStateException e){
-            System.out.println("Exception puting an url in the queue: " +  e);
-        }
+    // @Override
+    // public void putUrl(String newUrl) throws RemoteException {
+    //     try{
+    //         urlQueue.add(newUrl);
+    //     }catch(IllegalStateException e){
+    //         System.out.println("Exception puting an url in the queue: " +  e);
+    //     }
 
-    }
+    // }
     
 
     @Override
@@ -220,6 +215,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
 
             try {
+
                 Component newComp = new Component(getClientHost(),true);
                 system.put(threadName,newComp);
                 
@@ -308,8 +304,10 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     @Override
     public void putURLClient(String newUrl) throws RemoteException {
 
+        dwRMI.putUrlInQueue(newUrl);
         //adicionar no inicio da lista
-        urlQueue.addFirst(newUrl);
+        // urlQueue.addFirst(newUrl);
+
         
     }
 
@@ -357,9 +355,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         if (searches.size() >= 10)
             return new ArrayList<Searched>(searches.subList(0, 10));
         else{
-            System.out.println("SMALL SIZE");
             return new ArrayList<Searched>(searches.subList(0, searches.size()));
-
         }
     }
 }

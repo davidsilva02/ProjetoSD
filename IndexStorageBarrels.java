@@ -267,9 +267,10 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         //     // TODO Auto-generated catch block
         //     e.printStackTrace();
         // }
-        
-        return new ArrayList<>(sortedTermSearch);
-    }
+        if(sortedTermSearch != null)
+            return new ArrayList<>(sortedTermSearch);
+        return null;           
+}
 
     @Override
     public ArrayList<infoURL> resultsReferencesList(String url) throws RemoteException {

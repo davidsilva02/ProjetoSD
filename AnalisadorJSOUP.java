@@ -9,6 +9,7 @@ import org.jsoup.select.Elements;
 
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 
 public class AnalisadorJSOUP implements Runnable {
@@ -21,9 +22,10 @@ public class AnalisadorJSOUP implements Runnable {
     BlockingQueue<JSOUPData> l;
     Set <String> visited_urls;
     String threadName;
+    BlockingDeque<String> urlQueue;
 
 
-    public AnalisadorJSOUP(String threadName,BlockingQueue<JSOUPData> l, Set<String> visited_urls){
+    public AnalisadorJSOUP(String threadName,BlockingQueue<JSOUPData> l, Set<String> visited_urls,BlockingDeque filaURL){
         super();
 
         // try {
@@ -47,6 +49,7 @@ public class AnalisadorJSOUP implements Runnable {
         this.l=l;
         this.visited_urls=visited_urls;
         this.threadName =  threadName;
+        this.urlQueue = filaURL;
 
         try {
             server.addDownloader(threadName);
@@ -69,19 +72,38 @@ public class AnalisadorJSOUP implements Runnable {
             // if(visited_urls.size()==2) break;
             //ir buscar URL à queue
             while(newUrl == null){
+
                 try{
-                    //receive new url from the queue on the search module
-                    newUrl = server.getUrl();
+                    synchronized(this){
+                        newUrl = urlQueue.take();
+                        //urlQueue.remove(newUrl);
+                    }
+
                     //se nao existir, adicionamos que foi visitado
                     if(!visited_urls.contains(newUrl)) visited_urls.add(newUrl);
-                    //se o url já tiver sido visitado, nao fazemos nada, logo escolhemos outro url
                     else {
                         System.out.println("JA VISITOU");
                         newUrl=null;
                     }  
-                }catch(Exception e){
-                    //System.out.println("Exception on downloader: " + e.getMessage());
+
+                }catch(InterruptedException e){
+                    System.out.println("Exception taking an url from the queue: " +  e);
                 }
+
+                // try{
+                //     //receive new url from the queue
+                //     // newUrl = server.getUrl();
+                //     //se nao existir, adicionamos que foi visitado
+                //     if(!visited_urls.contains(newUrl)) visited_urls.add(newUrl);
+                //     //se o url já tiver sido visitado, nao fazemos nada, logo escolhemos outro url
+                //     else {
+                //         System.out.println("JA VISITOU");
+                //         newUrl=null;
+                //     }  
+                // }catch(Exception e){
+                //     //System.out.println("Exception on downloader: " + e.getMessage());
+                // }
+
             }
 
             try {
@@ -135,7 +157,15 @@ public class AnalisadorJSOUP implements Runnable {
                 Elements links = doc.select("a[href]");
                 for (Element link : links){    
                     j.addHip(link.attr("abs:href"));
-                    server.putUrl(link.attr("abs:href")); //não seria melhor fzer isto só no fim? ns
+                    
+                    synchronized(this){
+                        try{
+                            urlQueue.add(link.attr("abs:href"));
+                        }catch(IllegalStateException e){
+                            System.out.println("Exception puting an url in the queue: " +  e);
+                        }
+                    }
+                    // server.putUrl(link.attr("abs:href")); //não seria melhor fzer isto só no fim? ns
                     // System.out.println(link.text() + "\n" + link.attr("abs:href") + "\n");
                     // urls.add(link.attr("abs:href"));
                 }

@@ -50,7 +50,7 @@ public class RMIClient {
                     e.printStackTrace();
                 }
                 break;
-            //TODO: AINDA NAO ESTA COMPLETO FALTA AQUILO DAS PAGINAS
+
             case 2: // MAKE A SEARCH
                 input = sc.nextLine();
                try {
@@ -161,7 +161,7 @@ public class RMIClient {
                     System.out.println(" -- Top Searches -- ");
                     for(Searched searchObj: topSearchs)
                         System.out.println(String.format("%d - %s", searchObj.getNumSearches(), searchObj.getTerm()));
-                    
+                    System.out.println(" -------------------");
 
                     // System.out.println(result);
                     
