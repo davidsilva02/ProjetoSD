@@ -1,11 +1,4 @@
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.MulticastSocket;
-import java.net.SocketException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -14,17 +7,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 
 public class AnalisadorJSOUP implements Runnable {
 
-    private String MULTICAST_ADDRESS = "224.3.2.1";
-    private int PORT = 4321;
     // MulticastSocket socket;
     // InetAddress group;
     RMI server;
@@ -75,14 +63,8 @@ public class AnalisadorJSOUP implements Runnable {
     public void run() {
 
         String newUrl;
-        int numTries = 5;
-        int timeout = 700;
-        Boolean ack;
-
         while(true){
             newUrl = null;
-            ack = false;
-            
             //DEBUG
             // if(visited_urls.size()==2) break;
             //ir buscar URL à queue

@@ -1,9 +1,13 @@
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.ExportException;
+import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -50,13 +54,68 @@ public class RMIClient {
             case 2: // MAKE A SEARCH
                 input = sc.nextLine();
                try {
-                   ArrayList<infoURL> result=server.resultadoPesquisa(input);
+                   ArrayList<infoURL> result=server.resultadoPesquisa(input,this.hashCode());
+                   int num_pagina=1;
                    if(result!=null){
-                       for( infoURL iUrl: result)
+                       //se o tamanho for igual a 10, não há mais resultados
+                       if(result.get(result.size()-1).getUrl().equals("fim")){
+                           System.out.println("PAGINA " + 1 + "\n");
+                           for( infoURL iUrl: result){
+                               if(iUrl.getUrl().equals("fim")) break;
+                               System.out.println(iUrl);
+                            }
+                            
+                            System.out.println("SEM MAIS PAGINAS A MOSTRAR");
+                       }
+
+                       //se o tamanho for igual a 11, quer dizer que existem mais paginas
+                       else if(result.size()>=11){
+                        Integer hash_barrel=-1;
+                        System.out.println("PAGINA " + 1 + "\n");
+                        for( infoURL iUrl: result){
+                            if(result.indexOf(iUrl)==result.size()-1) break;
                             System.out.println(iUrl);
+                        }
+                        //o hash do barrel foi guardado na variavel url de forma a ser mais facil
+                        hash_barrel=Integer.parseInt(result.get(result.size()-1).getUrl());
+                       
+                        String option_pages=" ";
+                        while(true){
+                            result=null;
+                            option_pages="";
+                            while(!option_pages.equals("q") && !option_pages.equals("n")){
+                                System.out.println("PARA AVANCAR NA PAGINA: n , PARA SAIR DA PESQUISA q ");
+                                option_pages=sc.nextLine();
+                            }
+
+                            if(option_pages.equals("n")){
+                                result=server.continueSearching(this.hashCode(),hash_barrel);
+                            }
+
+                            if(option_pages.equals("q")) break;
+
+                            if(result==null) {
+                                System.out.println("SEM MAIS PAGINAS A MOSTRAR");
+                                break;
+                            }
+
+                            else{
+                                num_pagina+=1;
+                                System.out.println("PAGINA " + num_pagina+ "\n");
+                                for(infoURL iUrl: result){
+                                    if(iUrl.getUrl().equals("fim")) break;
+                                    System.out.println(iUrl);
+                               }
+
+                               if(result.get(result.size()-1).getUrl().equals("fim")) {
+                                System.out.println("SEM MAIS PAGINAS A MOSTRAR");
+                                break;
+                               }
+                            }
+                        }
+                    }  
                    }
                    else System.out.println("SEM RESULTADOS");
-
                } catch (RemoteException e) {
                    e.printStackTrace();
                }
@@ -171,9 +230,17 @@ public class RMIClient {
        System.out.println("0 PARA SAIR");
 
        int opt=0;
-
-       opt=sc.nextInt();
-       sc.nextLine();
+       Boolean flag=false;
+       while(!flag){
+       try{
+           opt=sc.nextInt();
+           flag=true;
+        }
+        catch(InputMismatchException e){
+            System.out.println("Introduzir uma opcao com o numero!");
+        }
+        sc.nextLine();
+    }
 
        return opt;
     }

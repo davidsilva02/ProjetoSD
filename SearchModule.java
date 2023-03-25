@@ -4,6 +4,7 @@ import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.server.RemoteObject;
 import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.BlockingDeque;
@@ -56,7 +57,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     }
 
     @Override
-    public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa) throws RemoteException {
+    synchronized public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa,Integer id_client) throws RemoteException {
         System.out.printf("Client pesquisou %s \n",termo_pesquisa);
 
         //add to the searched terms list
@@ -75,7 +76,23 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         searches.sort(Comparator.comparing(Searched::getNumSearches));
 
 
-        List<infoURL> result = pesquisa_barrel(termo_pesquisa);
+        //add to the searched terms list
+        newTerm = new Searched(1,termo_pesquisa);
+
+        if( searches.contains(newTerm) ){
+            
+            //get the current term and update the number of searches for the term
+            Searched updatedTerm = searches.get(searches.indexOf(newTerm));
+            updatedTerm.setNumSearches( updatedTerm.getNumSearches() + 1);
+            searches.set(searches.indexOf(newTerm),updatedTerm);
+        }
+        else
+            searches.add(newTerm);
+
+        searches.sort(Comparator.comparing(Searched::getNumSearches));
+
+
+        ArrayList<infoURL> result = pesquisa_barrel(termo_pesquisa,id_client);
         
         return (ArrayList<infoURL>)result;
     }
@@ -85,9 +102,10 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
      * @param termo_pesquisa
      * @return List<infoURL> if everything is OK, null if there was no result or no available barrels
      */
-    public List<infoURL> pesquisa_barrel(String termo_pesquisa){
-        List<infoURL> result=null;
+    synchronized public ArrayList<infoURL> pesquisa_barrel(String termo_pesquisa,Integer id_client){
+        ArrayList<infoURL> result=null;
         boolean hasValid=false;
+        BarrelRMI barrel_a_procurar =null;
 
         // loop through barrels while we can't get an answer
         while (!hasValid){
@@ -95,9 +113,8 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
             if(barrels.size()==0) {
                 result=null;
             }
-
+            barrel_a_procurar=null;
             Boolean flag=false;
-            BarrelRMI barrel_a_procurar =null;
             while(flag==false){
             try{
                 barrel_a_procurar= barrels.get(new Random().nextInt(barrels.size()));
@@ -108,7 +125,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
             }}
             
             try {
-                result = barrel_a_procurar.resultadoPesquisa(termo_pesquisa);
+                result = barrel_a_procurar.resultadoPesquisa(termo_pesquisa,id_client);
                 hasValid=true;
             } catch (RemoteException e) {
 
@@ -126,12 +143,14 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
                 e.printStackTrace();
                 }
             }
+            if(result!=null && result.get(result.size()-1).getUrl()=="fim") result=new ArrayList<infoURL>(result.subList(0, result.size()));
+            else if (result!=null)result.add(new infoURL(Integer.toString(barrel_a_procurar.hashCode())));
             return result;
     }
 
-    public List<infoURL> getReferencesList(String url){
+    public ArrayList<infoURL> getReferencesList(String url){
         	
-        List<infoURL> result=null;
+        ArrayList<infoURL> result=null;
         boolean hasValid=false;
 
         // loop through barrels while we can't get an answer
@@ -144,7 +163,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
             BarrelRMI barrel_a_procurar = barrels.get(new Random().nextInt(barrels.size()));
             
             try {
-                result = barrel_a_procurar.resultsReferencesList(url);
+                result =barrel_a_procurar.resultsReferencesList(url);
                 hasValid=true;
             } catch (RemoteException e) {
 
@@ -300,14 +319,46 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         return this.system;
     }
 
-    public ArrayList<Searched> getTopSearchs() throws RemoteException {
+
+    @Override
+    synchronized public ArrayList<infoURL> continueSearching(Integer id_client, Integer hash_barrel) throws RemoteException {
+        return cSearching(id_client, hash_barrel);
+    }
+
+
+    synchronized public ArrayList<infoURL> cSearching(Integer id_client,Integer hash_barrel){
+
+        ArrayList<infoURL> result=null;
+        BarrelRMI barrel_a_procurar =null;
+
+        //TODO: Nao esta o mais eficiente
+        for (BarrelRMI b: barrels){
+            if(b.hashCode()==hash_barrel){
+                barrel_a_procurar=b;
+                break;
+            }
+        }
+        
+        if(barrels.size()==0) {
+            result=null;
+        }
+        try {
+            result = barrel_a_procurar.continueSearch(id_client);
+        } catch (RemoteException e) {
+        }
+
+        return result;
+    }
+
+    // public List???? getTopSearchs() throws RemoteException {}
+    synchronized public ArrayList<Searched> getTopSearchs() throws RemoteException {
         System.out.println("GET TOP SEARCHS");
 
         if (searches.size() >= 10)
-            return new ArrayList(searches.subList(0, 10));
+            return new ArrayList<Searched>(searches.subList(0, 10));
         else{
             System.out.println("SMALL SIZE");
-            return new ArrayList(searches.subList(0, searches.size()));
+            return new ArrayList<Searched>(searches.subList(0, searches.size()));
 
         }
     }
