@@ -227,7 +227,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     }
 
     @Override
-    public List<infoURL> resultadoPesquisa(String termo_pesquisa) throws RemoteException {
+    public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa) throws RemoteException {
         String result;
 
         //marca barrel como ocupado
@@ -270,11 +270,11 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         //     e.printStackTrace();
         // }
         
-        return sortedTermSearch;
+        return new ArrayList<>(sortedTermSearch);
     }
 
     @Override
-    public List<infoURL> resultsReferencesList(String url) throws RemoteException {
+    public ArrayList<infoURL> resultsReferencesList(String url) throws RemoteException {
         return new ArrayList<>(this.urls.get(url).getUrls());
     }
 }

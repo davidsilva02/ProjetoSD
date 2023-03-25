@@ -56,7 +56,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     }
 
     @Override
-    public List<infoURL> resultadoPesquisa(String termo_pesquisa) throws RemoteException {
+    public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa) throws RemoteException {
         System.out.printf("Client pesquisou %s \n",termo_pesquisa);
 
         //add to the searched terms list
@@ -77,7 +77,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
         List<infoURL> result = pesquisa_barrel(termo_pesquisa);
         
-        return result;
+        return (ArrayList<infoURL>)result;
     }
 
     /**

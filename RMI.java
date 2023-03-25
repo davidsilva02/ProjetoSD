@@ -22,7 +22,7 @@ public interface RMI extends Remote {
 
     public String makeLogin(String username,String pw) throws RemoteException;
 
-	public List<infoURL> resultadoPesquisa(String termo_pesquisa) throws java.rmi.RemoteException;
+	public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa) throws java.rmi.RemoteException;
 
     public List<infoURL> getReferencesList(String url) throws RemoteException;
     

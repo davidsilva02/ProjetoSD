@@ -50,7 +50,7 @@ public class RMIClient {
             case 2: // MAKE A SEARCH
                 input = sc.nextLine();
                try {
-                   List<infoURL> result=server.resultadoPesquisa(input);
+                   ArrayList<infoURL> result=server.resultadoPesquisa(input);
                    if(result!=null){
                        for( infoURL iUrl: result)
                             System.out.println(iUrl);
@@ -66,8 +66,12 @@ public class RMIClient {
                 input = sc.nextLine();
               try {
                   List<infoURL> result= server.getReferencesList(input);
-                  System.out.println(result);
                   
+                  if( result != null )
+                    System.out.println(result);
+                  else
+                    System.out.println("URL não indexado!!");
+
               } catch (Exception e) {
                   e.printStackTrace();
               }
