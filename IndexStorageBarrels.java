@@ -281,17 +281,20 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         for (String s:termos){
             if(ind.containsKey(s.toLowerCase())){
                 for (infoURL i:ind.get(s.toLowerCase())){
+                    
                     if(urls.containsKey(i)){
                         urls.put(i,urls.get(i)+1);
                     }
                     else{
                         urls.put(i, 1);
                     }
+
                 }
             }
         }
 
         ArrayList<infoURL> sortedTermSearch = new ArrayList<>();
+        
         for (Integer i : urls.getAllKeys()){
             //System.out.println(i);
             HashSet<infoURL> termsSearch = urls.getKeys(i);
@@ -324,7 +327,10 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
     @Override
     public ArrayList<infoURL> resultsReferencesList(String url) throws RemoteException {
-        return new ArrayList<>(this.urls.get(url).getUrls());
+        if(urls.containsKey(url)){
+            return new ArrayList<>(this.urls.get(url).getUrls());
+        }
+        else return null;
     }
 
     @Override

@@ -127,7 +127,9 @@ public class RMIClient {
                   List<infoURL> result= server.getReferencesList(input);
                   
                   if( result != null )
-                    System.out.println(result);
+                   for(infoURL r:result){
+                    System.out.println(r);
+                    }
                   else
                     System.out.println("URL não indexado!!");
 
