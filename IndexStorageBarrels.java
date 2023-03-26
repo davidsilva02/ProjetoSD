@@ -1,4 +1,5 @@
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 
@@ -26,17 +28,78 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     MulticastSocket socket;
     InetAddress group;
     RMI server;
+    String barrelName;
     ConcurrentHashMap<String,HashSet<infoURL>> ind; // termo: LINKS QUE CONTÉM O TERMO
     ConcurrentHashMap<String,infoURL> urls; // fatherUrl: LISTA DE URLS QUE FAZEM REFERENCIA PARA O fatherUrl
     ConcurrentHashMap <Integer,ArrayList<infoURL>> resultados_pesquisa;
 
 
-    public IndexStorageBarrels() throws RemoteException{
+    public IndexStorageBarrels(String name) throws RemoteException{
         super();
 
-        this.ind= new ConcurrentHashMap<>();
-        this.urls= new ConcurrentHashMap<>();
-        this.resultados_pesquisa=new ConcurrentHashMap<>();
+        this.barrelName = name;
+
+        File folder = new File("./ISB");
+        folder.mkdir();
+        
+        File indBin = new File(String.format("./ISB/index_%s.bin",name));
+
+        if( !indBin.exists() ){
+            ind = new ConcurrentHashMap<>();
+
+            try {
+                indBin.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            ind = (ConcurrentHashMap<String,HashSet<infoURL>>)FileOps.readFromDisk(indBin);
+
+            if(ind == null)
+                ind = new ConcurrentHashMap<String,HashSet<infoURL>>();
+
+        }
+
+        File urlsBin = new File(String.format("./ISB/urls_%s.bin",name));
+
+        if( !urlsBin.exists() ){
+            urls = new ConcurrentHashMap<>();
+
+            try {
+                urlsBin.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            urls = (ConcurrentHashMap<String,infoURL>)FileOps.readFromDisk(urlsBin);
+
+            if(urls == null)
+                urls = new ConcurrentHashMap<>();
+
+        }
+
+        File searchResultsBin = new File(String.format("./ISB/searchResults_%s.bin",name));
+
+        if( !searchResultsBin.exists() ){
+            resultados_pesquisa = new ConcurrentHashMap<>();
+
+            try {
+                searchResultsBin.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            resultados_pesquisa = (ConcurrentHashMap <Integer,ArrayList<infoURL>>)FileOps.readFromDisk(searchResultsBin);
+
+            if(resultados_pesquisa == null)
+                resultados_pesquisa = new ConcurrentHashMap<Integer,ArrayList<infoURL>>();
+
+        }
+
+
 
         try {
             this.socket=new MulticastSocket(PORT);
@@ -55,7 +118,13 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     }
 
     public static void main(String[] args) throws RemoteException {
-        IndexStorageBarrels t = new IndexStorageBarrels();
+
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Introduza o nome do barrel:");
+        String barrelName = sc.nextLine();
+        sc.close();
+
+        IndexStorageBarrels t = new IndexStorageBarrels(barrelName);
         System.out.printf("BARREL WITH HASH %d\n", t.hashCode());        
         t.start();
     }
@@ -125,12 +194,13 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
             System.out.printf("RECEBI O TAMANHO %d", tamanho_a_receber);
 
+            DatagramPacket recv = null;
             //enquanto nao receber a opcao correta
             while(opt!=1){
                 //TODO: temos de mandar uma mensagem com o tamanho da classe que serializamos?
                     //para colocarmos aqui o tamanho certo
                     buf = new byte[tamanho_a_receber+1];
-                    DatagramPacket recv = new DatagramPacket(buf, buf.length);
+                    recv = new DatagramPacket(buf, buf.length);
                     try {
                         socket.receive(recv);
                     } catch (IOException e) {
@@ -140,40 +210,36 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
                     //checa opcao
                     opt=buf[0];
-
-                    if(opt==1){
-                        byte data[] = new byte [recv.getLength()-1];
-                        System.arraycopy(recv.getData(), 1, data, 0, recv.getLength()-1);
-
-                        InetAddress senderAddress = recv.getAddress();
-                        int senderPort = recv.getPort();
-                        // System.out.println("Endereço IP do programa que enviou os dados multicast: " + senderAddress.getHostAddress());
-                        // System.out.println("Porta do programa que enviou os dados multicast: " + senderPort);
-                        
-                        // Crie um pacote de dados para enviar de volta ao remetente
-                        byte sendData[] = Integer.toString(this.hashCode()).getBytes();
-                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, senderAddress, senderPort);
-                        try {
-                            socket.send(sendPacket);
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        
-                        ByteArrayInputStream bis = new ByteArrayInputStream(data);
-                        ObjectInputStream ois;
-                        try {
-                            ois = new ObjectInputStream(bis);
-                            obj = (JSOUPData) ois.readObject();
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        } catch (ClassNotFoundException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                    }
                 }
+             
+                byte data[] = new byte [recv.getLength()-1];
+                System.arraycopy(recv.getData(), 1, data, 0, recv.getLength()-1);
+
+                InetAddress senderAddress = recv.getAddress();
+                int senderPort = recv.getPort();
+                // System.out.println("Endereço IP do programa que enviou os dados multicast: " + senderAddress.getHostAddress());
+                // System.out.println("Porta do programa que enviou os dados multicast: " + senderPort);
+                
+                // Crie um pacote de dados para enviar de volta ao remetente (ACK)
+                byte sendData[] = Integer.toString(this.hashCode()).getBytes();
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, senderAddress, senderPort);
+                try {
+                    socket.send(sendPacket);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                
+                ByteArrayInputStream bis = new ByteArrayInputStream(data);
+                ObjectInputStream ois;
+                try {
+                    ois = new ObjectInputStream(bis);
+                    obj = (JSOUPData) ois.readObject();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
 
                 
                 if(obj!=null){
@@ -223,6 +289,9 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     
                 }
 
+                FileOps.writeToDisk(new File(String.format("./ISB/index_%s.bin",barrelName)), ind);
+                FileOps.writeToDisk(new File(String.format("./ISB/urls_%s.bin",barrelName)), urls);
+
                 // System.out.println(urls);
 
             }
@@ -258,6 +327,8 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 resultados_pesquisa.put(id_client, new ArrayList<infoURL>(sortedTermSearch.subList(10, sortedTermSearch.size())));
                 sortedTermSearch=new ArrayList<infoURL>(sortedTermSearch.subList(0, 10));
             }
+
+            FileOps.writeToDisk(new File(String.format("./ISB/searchResults_%s.bin",barrelName)), resultados_pesquisa);
 
         }
         // if(termo_pesquisa.equals("ABC")) result="COM RESULTADOS";

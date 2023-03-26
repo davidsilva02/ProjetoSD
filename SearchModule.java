@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -27,16 +29,63 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
     private CopyOnWriteArrayList<BarrelRMI> barrels=new CopyOnWriteArrayList<>();
     // private BlockingDeque<String> urlQueue = new LinkedBlockingDeque<>();
-    private HashMap<String,Integer> users = new HashMap<>();
+    private HashMap<String,Integer> users;
     private HashMap<String,Component> system = new HashMap<>(); // IP:NAME, Boolean stands for isAvailable, (True/False)
-    private CopyOnWriteArrayList<Searched> searches = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<Searched> searches;
     DownloaderRMI dwRMI;
 
     // private ConcurrentLinkedQueue;
 
     public SearchModule() throws RemoteException {
 		super();
-	}
+	
+        File folder = new File("./SM");
+        folder.mkdir();
+        
+        
+
+        File usrBin = new File("./SM/users.bin");
+
+        if( !usrBin.exists() ){
+            users = new HashMap<>();
+
+            try {
+                usrBin.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            users = (HashMap<String,Integer>)FileOps.readFromDisk(usrBin);
+
+            if(users == null)
+                users = new HashMap<>();
+
+            // for( String key : users.keySet())
+                // System.out.println(String.format("%s:%s",key,users.get(key)));
+        }
+
+
+        File searchBin = new File("./SM/searches.bin");
+
+        if( !searchBin.exists() ){
+            searches = new CopyOnWriteArrayList<Searched>();
+
+            try {
+                searchBin.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            searches = (CopyOnWriteArrayList<Searched>)FileOps.readFromDisk(searchBin);
+
+            if(searches == null)
+                searches = new CopyOnWriteArrayList<Searched>();
+
+        }
+
+    }
 
     
     public static void main(String[] args) {
@@ -54,6 +103,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 		} /*catch (MalformedURLException e) {
 			System.out.println("MalformedURLException in HelloImpl.main: " + e);
 		}*/
+
 
     }
 
@@ -86,6 +136,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
         searches.sort(Comparator.comparing(Searched::getNumSearches));
 
+        FileOps.writeToDisk(new File("./SM/searches.bin"), searches);
 
         ArrayList<infoURL> result = pesquisa_barrel(termo_pesquisa,id_client);
         
@@ -137,7 +188,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
                 }
                 e.printStackTrace();
                 }
-            }
+        }
             // System.out.println(result);
             // System.out.println(result.size());
             if(result!=null && result.get(result.size()-1).getUrl().equals("fim")) return result;
@@ -287,6 +338,9 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
             return 1;
         
         users.put(username, pw.hashCode());
+
+        FileOps.writeToDisk(new File("./SM/users.bin"),users);
+
         return 0;
     }
 
