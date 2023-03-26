@@ -13,12 +13,15 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 
@@ -296,6 +299,35 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
             }
     }
+    /**
+     * HashMap personalizado, de forma a conseguir obter de forma rápida os urls que aparecem x vezes nos termos, para aparecerem em primeiro lugar os urls que tem mais correspondência 
+     */
+    class searchTermosHash<infoURL,Integer> extends HashMap<infoURL,Integer>{
+        HashMap<Integer,HashSet<infoURL>> reverse = new HashMap<>();
+    
+        @Override
+        public Integer put(infoURL key, Integer value)
+        {
+            //verificar se ja existe tamanho inferior, se for o caso apagar
+            int i = (int)value-1;
+            if(reverse.get(i)!=null && reverse.get(i).contains(key)) reverse.get(i).remove(key);
+
+
+            if(reverse.get(value)==null) reverse.put(value,new HashSet<infoURL>());
+            reverse.get(value).add(key);
+            
+            return super.put(key, value);
+        }
+        public HashSet<infoURL> getKeys(Integer value) {
+            return reverse.get(value);
+        }
+
+        public ArrayList<Integer> getAllKeys(){
+            ArrayList<Integer> keys = new ArrayList<>(reverse.keySet());
+            Collections.reverse(keys);
+            return keys;            
+        }
+    }
 
     @Override
     synchronized public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa, Integer id_client) throws RemoteException {
@@ -312,25 +344,48 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         // System.out.println(ind.get(termo_pesquisa));
 
         // procurar pelo termo
-        ArrayList<infoURL> sortedTermSearch = null;
-        HashSet<infoURL> termSearch = ind.get(termo_pesquisa.toLowerCase());
-        
-        // se encontrarmos o termo
-        if( termSearch != null ) {
-            //ordenar os links da pesquisa pelo nr de referencias
-            sortedTermSearch = new ArrayList<infoURL>(termSearch);
-            sortedTermSearch.sort(Comparator.comparing(infoURL::numeroURL));
+        String[] termos = termo_pesquisa.split(" ");
+        searchTermosHash <infoURL,Integer> urls = new searchTermosHash<>();
 
-            //nao existem mais paginas
-            if(sortedTermSearch.size()<=10) sortedTermSearch.add(new infoURL("fim"));
-            else{
-                resultados_pesquisa.put(id_client, new ArrayList<infoURL>(sortedTermSearch.subList(10, sortedTermSearch.size())));
-                sortedTermSearch=new ArrayList<infoURL>(sortedTermSearch.subList(0, 10));
+        for (String s:termos){
+            if(ind.containsKey(s.toLowerCase())){
+                for (infoURL i:ind.get(s.toLowerCase())){
+                    
+                    if(urls.containsKey(i)){
+                        urls.put(i,urls.get(i)+1);
+                    }
+                    else{
+                        urls.put(i, 1);
+                    }
+
+                }
             }
-
-            FileOps.writeToDisk(new File(String.format("./ISB/searchResults_%s.bin",barrelName)), resultados_pesquisa);
-
         }
+
+            
+            
+        ArrayList<infoURL> sortedTermSearch = new ArrayList<>();
+        
+        for (Integer i : urls.getAllKeys()){
+            //System.out.println(i);
+            HashSet<infoURL> termsSearch = urls.getKeys(i);
+            ArrayList <infoURL> sortedTermsSearch_ = new ArrayList<>(termsSearch);
+            //ordenar pelo numero de referencias
+            sortedTermsSearch_.sort(Comparator.comparing(infoURL::numeroURL));
+            //System.out.println(sortedTermsSearch_);
+            sortedTermSearch.addAll(sortedTermsSearch_);
+        }
+        
+
+        
+         //nao existem mais paginas
+        if(sortedTermSearch.size()<=10) sortedTermSearch.add(new infoURL("fim"));
+        else{
+            resultados_pesquisa.put(id_client, new ArrayList<infoURL>(sortedTermSearch.subList(10, sortedTermSearch.size())));
+            sortedTermSearch=new ArrayList<infoURL>(sortedTermSearch.subList(0, 10));
+        }
+        
+        FileOps.writeToDisk(new File(String.format("./ISB/searchResults_%s.bin",barrelName)), resultados_pesquisa);
         // if(termo_pesquisa.equals("ABC")) result="COM RESULTADOS";
         // else result="SEM RESULTADOS";
 
@@ -341,14 +396,16 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         //     // TODO Auto-generated catch block
         //     e.printStackTrace();
         // }
-        if(sortedTermSearch != null)
-            return new ArrayList<>(sortedTermSearch);
+        if(sortedTermSearch.size()>0) return sortedTermSearch;
         return null;           
 }
 
     @Override
     public ArrayList<infoURL> resultsReferencesList(String url) throws RemoteException {
-        return new ArrayList<>(this.urls.get(url).getUrls());
+        if(urls.containsKey(url)){
+            return new ArrayList<>(this.urls.get(url).getUrls());
+        }
+        else return null;
     }
 
     @Override
