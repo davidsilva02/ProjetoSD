@@ -239,6 +239,9 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         //     e.printStackTrace();
         // }
 
+        // System.out.printf("PESQUISA PELO TERMO %s\n",termo_pesquisa);
+        // System.out.println(ind.get(termo_pesquisa));
+
         // procurar pelo termo
         ArrayList<infoURL> sortedTermSearch = null;
         HashSet<infoURL> termSearch = ind.get(termo_pesquisa.toLowerCase());
@@ -247,7 +250,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         if( termSearch != null ) {
             //ordenar os links da pesquisa pelo nr de referencias
             sortedTermSearch = new ArrayList<infoURL>(termSearch);
-            sortedTermSearch.sort(Comparator.comparing(infoURL::numeroURL));   
+            sortedTermSearch.sort(Comparator.comparing(infoURL::numeroURL));
 
             //nao existem mais paginas
             if(sortedTermSearch.size()<=10) sortedTermSearch.add(new infoURL("fim"));

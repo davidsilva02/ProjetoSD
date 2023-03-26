@@ -29,7 +29,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     // private BlockingDeque<String> urlQueue = new LinkedBlockingDeque<>();
     private HashMap<String,Integer> users = new HashMap<>();
     private HashMap<String,Component> system = new HashMap<>(); // IP:NAME, Boolean stands for isAvailable, (True/False)
-    private ArrayList<Searched> searches = new ArrayList<>();
+    private CopyOnWriteArrayList<Searched> searches = new CopyOnWriteArrayList<>();
     DownloaderRMI dwRMI;
 
     // private ConcurrentLinkedQueue;
@@ -138,7 +138,9 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
                 e.printStackTrace();
                 }
             }
-            if(result!=null && result.get(result.size()-1).getUrl()=="fim") result=new ArrayList<infoURL>(result.subList(0, result.size()));
+            // System.out.println(result);
+            // System.out.println(result.size());
+            if(result!=null && result.get(result.size()-1).getUrl().equals("fim")) return result;
             else if (result!=null)result.add(new infoURL(Integer.toString(barrel_a_procurar.hashCode())));
             return result;
     }
@@ -358,4 +360,5 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
             return new ArrayList<Searched>(searches.subList(0, searches.size()));
         }
     }
+
 }
