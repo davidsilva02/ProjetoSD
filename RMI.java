@@ -27,9 +27,13 @@ public interface RMI extends Remote {
 
     public ArrayList<infoURL> getReferencesList(String url) throws RemoteException;
     
-    public void AvailableBarrel(BarrelRMI b) throws java.rmi.RemoteException;
+    public void addBarrel(BarrelRMI b,String name) throws java.rmi.RemoteException;
 
     public void notAvailableBarrel(BarrelRMI b) throws java.rmi.RemoteException;
+
+    public void makeBarrelUnavailable(String name) throws RemoteException;
+
+    public void makeBarrelAvailable(String name) throws RemoteException;
 
     // public String getUrl() throws RemoteException;
 

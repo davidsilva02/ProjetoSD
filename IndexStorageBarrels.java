@@ -148,7 +148,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
          //envia ao server que existe um barrel disponivel
          try {
-            server.AvailableBarrel(this);
+            server.addBarrel(this,this.barrelName);
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -348,7 +348,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         //marca barrel como ocupado
         //envia ao server que o barrel ja nao esta disponivel
         // try {
-        //     server.notAvailableBarrel(this);
+        //     server.notAvailableBarrel(this,this.barrelName);
         // } catch (RemoteException e) {
         //     // TODO Auto-generated catch block
         //     e.printStackTrace();
@@ -356,6 +356,8 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
         // System.out.printf("PESQUISA PELO TERMO %s\n",termo_pesquisa);
         // System.out.println(ind.get(termo_pesquisa));
+
+        server.makeBarrelUnavailable(this.barrelName);
 
         // procurar pelo termo
         String[] termos = termo_pesquisa.split(" ");
@@ -413,6 +415,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         //     // TODO Auto-generated catch block
         //     e.printStackTrace();
         // }
+        server.makeBarrelAvailable(this.barrelName);
         if(sortedTermSearch.size()>0) return sortedTermSearch;
         return null;           
 }

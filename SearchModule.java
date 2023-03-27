@@ -305,14 +305,14 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     }
 
     @Override
-    public void AvailableBarrel(BarrelRMI b) throws RemoteException {
+    public void addBarrel(BarrelRMI b, String name) throws RemoteException {
         barrels.add(b);
 
         try {
-            system.put(String.format("%s",b.hashCode()),new Component(getClientHost(), true));
+            system.put(name,new Component(getClientHost(), true));
 
             //DEBUG
-            System.out.println("ADD BARREL "+getClientHost());
+            System.out.println("ADD BARREL "+getClientHost() + ":" + name);
         } catch (ServerNotActiveException e) {
             e.printStackTrace();
         }
@@ -332,11 +332,19 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         System.out.println("Barrel disponivel:" + b.hashCode());
     }
 
+    public void makeBarrelUnavailable(String name) throws RemoteException{
+        system.replace(name, new Component(system.get(name).getIp(), false));
+    }
+
+    public void makeBarrelAvailable(String name) throws RemoteException{
+        system.replace(name, new Component(system.get(name).getIp(), true));
+    }
+
     @Override
     public void notAvailableBarrel(BarrelRMI b) throws RemoteException {
         barrels.remove(barrels.indexOf(b));
 
-        system.replace(Integer.toString(b.hashCode()), new Component( system.get(Integer.toString(b.hashCode())).getIp() , false) );
+        //system.replace(Integer.toString(b.hashCode()), new Component( system.get(Integer.toString(b.hashCode())).getIp() , false) );
 
         //adicionar barrel no Downloader
         if(dwRMI!=null){
