@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap.KeySetView;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jsoup.Jsoup;
 import org.w3c.dom.views.DocumentView;
@@ -27,9 +28,13 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI{
     String name;
     BlockingQueue<JSOUPData> l;
     private BlockingDeque<String> urlQueue;
-
+    
     //urls visitados
     Set <String> visited_urls;
+
+    
+    AtomicInteger number_barrels;
+    Object lock_changes;
 
 
 
@@ -100,6 +105,8 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI{
                 this.l = new LinkedBlockingQueue<>();
         }
 
+        this.lock_changes=new Object();
+        this.number_barrels=new AtomicInteger();
     }
     public static void main(String[] args){
 
@@ -112,7 +119,6 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI{
         }
 
         dw.start();
-
     }
     private void start() {
 
@@ -123,12 +129,13 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI{
             e.printStackTrace();
         }
 
+        System.out.println(this.visited_urls);
 
-        new MulticastSender("MS", this.l);
+        new MulticastSender("MS", this.l,number_barrels,lock_changes);
 
 
         //TODO: Colocar por argumento o numero de threads a criar
-        for(int i = 0; i < Integer.parseInt("10"); i++) {
+        for(int i = 0; i < Integer.parseInt("20"); i++) {
            new  AnalisadorJSOUP("Downloader" + Integer.toString(i), l,visited_urls,urlQueue);
         }
         
@@ -143,6 +150,17 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+    @Override
+    public void updateNumberBarrels(Integer n) throws RemoteException {
+        //provavelmente antes era 0, fazer notify
+        if(n==1){
+            synchronized(lock_changes){
+                lock_changes.notify();
+            }
+        }
+
+        number_barrels.set(n);
     }
 
 }

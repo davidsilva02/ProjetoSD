@@ -289,12 +289,15 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                         }
                     }
     
+                    // //salvar para disco
+                    // ConcurrentHashMap<?,?> copyInd = new ConcurrentHashMap<>(ind);
+                    // ConcurrentHashMap<?,?> copyUrls = new ConcurrentHashMap<>(urls);
+
+                    // new Thread(() -> {
+                        FileOps.writeToDisk(new File(String.format("./ISB/index_%s.bin",barrelName)),ind);
+                        FileOps.writeToDisk(new File(String.format("./ISB/urls_%s.bin",barrelName)),urls);
+                    // }).start();
                 }
-
-                FileOps.writeToDisk(new File(String.format("./ISB/index_%s.bin",barrelName)), ind);
-                FileOps.writeToDisk(new File(String.format("./ISB/urls_%s.bin",barrelName)), urls);
-
-                // System.out.println(urls);
 
             }
     }
@@ -383,8 +386,9 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             resultados_pesquisa.put(id_client, new ArrayList<infoURL>(sortedTermSearch.subList(10, sortedTermSearch.size())));
             sortedTermSearch=new ArrayList<infoURL>(sortedTermSearch.subList(0, 10));
         }
-        
-        FileOps.writeToDisk(new File(String.format("./ISB/searchResults_%s.bin",barrelName)), resultados_pesquisa);
+        // new Thread(() -> {
+            FileOps.writeToDisk(new File(String.format("./ISB/searchResults_%s.bin",barrelName)), (resultados_pesquisa));
+        // }).start();
         // if(termo_pesquisa.equals("ABC")) result="COM RESULTADOS";
         // else result="SEM RESULTADOS";
 

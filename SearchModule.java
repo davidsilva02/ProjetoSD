@@ -136,8 +136,11 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
         searches.sort(Comparator.comparing(Searched::getNumSearches));
 
-        FileOps.writeToDisk(new File("./SM/searches.bin"), searches);
-
+        // new Thread(() -> {
+            FileOps.writeToDisk(new File("./SM/searches.bin"), searches);
+        // }).start();
+        
+        if(barrels.size()==0) return null;
         ArrayList<infoURL> result = pesquisa_barrel(termo_pesquisa,id_client);
         
         return (ArrayList<infoURL>)result;
@@ -306,6 +309,18 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
             e.printStackTrace();
         }
 
+
+
+        //adicionar barrel no Downloader
+        if(dwRMI!=null){
+            try{
+                dwRMI.updateNumberBarrels(barrels.size());
+            }
+            catch (RemoteException e1){
+                System.out.println("Ainda nao existe um downloader");
+            }
+        }
+
         System.out.println("Barrel disponivel:" + b.hashCode());
     }
 
@@ -314,6 +329,17 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         barrels.remove(barrels.indexOf(b));
 
         system.replace(Integer.toString(b.hashCode()), new Component( system.get(Integer.toString(b.hashCode())).getIp() , false) );
+
+        //adicionar barrel no Downloader
+        if(dwRMI!=null){
+            try{
+                dwRMI.updateNumberBarrels(barrels.size());
+            }
+            catch (RemoteException e1){
+                System.out.println("Ainda nao existe um downloader");
+            }
+        }
+
  
 
         System.out.println("Barrel indisponivel:" + b.hashCode());
@@ -338,14 +364,16 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
             return 1;
         
         users.put(username, pw.hashCode());
+        // new Thread(() -> {
+            FileOps.writeToDisk(new File("./SM/users.bin"),users);
+        // }).start();
 
-        FileOps.writeToDisk(new File("./SM/users.bin"),users);
 
         return 0;
     }
 
     @Override
-    public int numberBarrels() throws RemoteException {
+    public Integer numberBarrels() throws RemoteException {
         return barrels.size();
     }
 

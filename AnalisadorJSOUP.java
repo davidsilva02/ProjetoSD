@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class AnalisadorJSOUP implements Runnable {
 
@@ -85,10 +87,13 @@ public class AnalisadorJSOUP implements Runnable {
                     else {
                         System.out.println("JA VISITOU");
                         newUrl=null;
-                    }  
+                    }
+                    
+                    // new Thread(() -> {
+                        FileOps.writeToDisk(new File("./DW/l.bin"), (l));
+                        FileOps.writeToDisk(new File("./DW/urlQ.bin"),(urlQueue));
+                    // }).start();
 
-                    FileOps.writeToDisk(new File("./DW/l.bin"), this.l);
-                    FileOps.writeToDisk(new File("./DW/urlQ.bin"), this.urlQueue);
 
                 }catch(InterruptedException e){
                     System.out.println("Exception taking an url from the queue: " +  e);

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public interface RMI extends Remote {
 
@@ -38,7 +39,7 @@ public interface RMI extends Remote {
 
     public void putURLClient(String newUrl) throws RemoteException;
 
-    public int numberBarrels() throws RemoteException;
+    public Integer numberBarrels() throws RemoteException;
     
     public void updateBarrels(HashSet<Integer> hashs) throws RemoteException;
 
