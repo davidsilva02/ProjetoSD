@@ -14,6 +14,7 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class AnalisadorJSOUP implements Runnable {
 
@@ -26,10 +27,14 @@ public class AnalisadorJSOUP implements Runnable {
     Set <String> visited_urls;
     String threadName;
     BlockingDeque<String> urlQueue;
+    ReentrantLock lockFile1;
 
 
-    public AnalisadorJSOUP(String threadName,BlockingQueue<JSOUPData> l, Set<String> visited_urls,BlockingDeque<String> filaURL){
+
+    public AnalisadorJSOUP(String threadName,BlockingQueue<JSOUPData> l, Set<String> visited_urls,BlockingDeque<String> filaURL,ReentrantLock lockFile1){
         super();
+
+        this.lockFile1=lockFile1;
 
         // try {
         //     this.socket=new MulticastSocket();
@@ -83,16 +88,27 @@ public class AnalisadorJSOUP implements Runnable {
                     }
 
                     //se nao existir, adicionamos que foi visitado
-                    if(!visited_urls.contains(newUrl)) visited_urls.add(newUrl);
+                    if(!visited_urls.contains(newUrl)) {
+                        visited_urls.add(newUrl);
+
+                        new Thread(() -> {
+                            lockFile1.lock();
+                            FileOps.writeToDisk(new File("./DW/visitedURLS.bin"), (visited_urls));
+                            lockFile1.unlock();
+                        }).start();
+
+                    }
                     else {
                         System.out.println("JA VISITOU");
                         newUrl=null;
                     }
                     
-                    // new Thread(() -> {
+                    new Thread(() -> {
+                        lockFile1.lock();
                         FileOps.writeToDisk(new File("./DW/l.bin"), (l));
                         FileOps.writeToDisk(new File("./DW/urlQ.bin"),(urlQueue));
-                    // }).start();
+                        lockFile1.unlock();
+                    }).start();
 
 
                 }catch(InterruptedException e){

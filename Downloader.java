@@ -18,6 +18,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap.KeySetView;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jsoup.Jsoup;
 import org.w3c.dom.views.DocumentView;
@@ -35,6 +36,8 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI{
     
     AtomicInteger number_barrels;
     Object lock_changes;
+
+    ReentrantLock lockFileJSOUP;
 
 
 
@@ -107,6 +110,7 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI{
 
         this.lock_changes=new Object();
         this.number_barrels=new AtomicInteger();
+        lockFileJSOUP=new ReentrantLock();
     }
     public static void main(String[] args){
 
@@ -129,14 +133,12 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI{
             e.printStackTrace();
         }
 
-        System.out.println(this.visited_urls);
-
         new MulticastSender("MS", this.l,number_barrels,lock_changes);
 
 
         //TODO: Colocar por argumento o numero de threads a criar
         for(int i = 0; i < Integer.parseInt("20"); i++) {
-           new  AnalisadorJSOUP("Downloader" + Integer.toString(i), l,visited_urls,urlQueue);
+           new  AnalisadorJSOUP("Downloader" + Integer.toString(i), l,visited_urls,urlQueue,lockFileJSOUP);
         }
         
         // for(int i = 0; i < Integer.parseInt(args[0]); i++)

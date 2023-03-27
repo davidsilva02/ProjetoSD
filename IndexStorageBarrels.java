@@ -23,6 +23,8 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
 public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRMI{
@@ -35,13 +37,14 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     ConcurrentHashMap<String,HashSet<infoURL>> ind; // termo: LINKS QUE CONTÉM O TERMO
     ConcurrentHashMap<String,infoURL> urls; // fatherUrl: LISTA DE URLS QUE FAZEM REFERENCIA PARA O fatherUrl
     ConcurrentHashMap <Integer,ArrayList<infoURL>> resultados_pesquisa;
+    ReentrantLock lockFile;
+    ReentrantLock lockFile1;
 
 
     public IndexStorageBarrels(String name) throws RemoteException{
         super();
 
         this.barrelName = name;
-
         File folder = new File("./ISB");
         folder.mkdir();
         
@@ -117,6 +120,9 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             e.printStackTrace();
             System.exit(0);
         }
+
+        this.lockFile = new ReentrantLock();
+        this.lockFile1 = new ReentrantLock();
     }
 
     public static void main(String[] args) throws RemoteException {
@@ -253,50 +259,56 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                     String citation=obj.getCitation();
                     HashSet <String> termos = obj.getTermos();
                     HashSet <String> hip = obj.getHip();
-        
-                    if(!urls.containsKey(url)){
-                        urlAtual=new infoURL(url,title, citation);
-                        urls.put(url, urlAtual);
-                    }
-                    else {
-                        urlAtual=urls.get(url);
-                        urlAtual.setTitle(title);
-                        urlAtual.setCitation(citation);
-                    }
-                    
-                    // adicionar cada termo encontrado no index se não existir, se existir apenas adicionar o url como value
-                    for (String termoString: termos){
-                        if(!ind.containsKey(termoString)){
-                            //temos de criar entrada                
-                            HashSet<infoURL> urls = new HashSet<>();
-                            urls.add(urlAtual);
-                            ind.put(termoString,urls);
+
+                        
+                        if(!urls.containsKey(url)){
+                            urlAtual=new infoURL(url,title, citation);
+                            urls.put(url, urlAtual);
                         }
                         else {
-                            ind.get(termoString).add(urlAtual);
+                            urlAtual=urls.get(url);
+                            urlAtual.setTitle(title);
+                            urlAtual.setCitation(citation);
                         }
-                    }
+
+                        
+                        // adicionar cada termo encontrado no index se não existir, se existir apenas adicionar o url como value
+                        for (String termoString: termos){
+                            if(!ind.containsKey(termoString)){
+                                //temos de criar entrada                
+                                HashSet<infoURL> urls = new HashSet<>();
+                                urls.add(urlAtual);
+                                ind.put(termoString,urls);
+                            }
+                            else {
+                                ind.get(termoString).add(urlAtual);
+                            }
+                        }
+
+                        for (String hipString : hip){
+                            if(!urls.containsKey(hipString)){
+                                infoURL info = new infoURL(hipString);
+                                info.addURL(urlAtual);
+                                urls.put(hipString,info);
+                            }
+                            else {
+                                infoURL existente =urls.get(hipString);
+                                existente.addURL(urlAtual);
+                            }
+                        }
                     
-                    for (String hipString : hip){
-                        if(!urls.containsKey(hipString)){
-                            infoURL info = new infoURL(hipString);
-                            info.addURL(urlAtual);
-                            urls.put(hipString,info);
-                        }
-                        else {
-                            infoURL existente =urls.get(hipString);
-                            existente.addURL(urlAtual);
-                        }
-                    }
+                    
     
                     // //salvar para disco
                     // ConcurrentHashMap<?,?> copyInd = new ConcurrentHashMap<>(ind);
                     // ConcurrentHashMap<?,?> copyUrls = new ConcurrentHashMap<>(urls);
 
-                    // new Thread(() -> {
+                    new Thread(() -> {
+                        lockFile.lock();
                         FileOps.writeToDisk(new File(String.format("./ISB/index_%s.bin",barrelName)),ind);
                         FileOps.writeToDisk(new File(String.format("./ISB/urls_%s.bin",barrelName)),urls);
-                    // }).start();
+                        lockFile.unlock();
+                    }).start();
                 }
 
             }
@@ -386,9 +398,11 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             resultados_pesquisa.put(id_client, new ArrayList<infoURL>(sortedTermSearch.subList(10, sortedTermSearch.size())));
             sortedTermSearch=new ArrayList<infoURL>(sortedTermSearch.subList(0, 10));
         }
-        // new Thread(() -> {
+        new Thread(() -> {
+            lockFile1.lock();
             FileOps.writeToDisk(new File(String.format("./ISB/searchResults_%s.bin",barrelName)), (resultados_pesquisa));
-        // }).start();
+            lockFile1.unlock();
+        }).start();
         // if(termo_pesquisa.equals("ABC")) result="COM RESULTADOS";
         // else result="SEM RESULTADOS";
 

@@ -24,6 +24,7 @@ import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class SearchModule extends UnicastRemoteObject implements RMI {
 
@@ -33,6 +34,8 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     private HashMap<String,Component> system = new HashMap<>(); // IP:NAME, Boolean stands for isAvailable, (True/False)
     private CopyOnWriteArrayList<Searched> searches;
     DownloaderRMI dwRMI;
+    ReentrantLock lockFile1;
+    ReentrantLock lockFile2;
 
     // private ConcurrentLinkedQueue;
 
@@ -85,6 +88,9 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
         }
 
+        lockFile1=new ReentrantLock();
+        lockFile2=new ReentrantLock();
+
     }
 
     
@@ -136,9 +142,11 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
         searches.sort(Comparator.comparing(Searched::getNumSearches));
 
-        // new Thread(() -> {
+        new Thread(() -> {
+            lockFile1.lock();
             FileOps.writeToDisk(new File("./SM/searches.bin"), searches);
-        // }).start();
+            lockFile1.unlock();
+        }).start();
         
         if(barrels.size()==0) return null;
         ArrayList<infoURL> result = pesquisa_barrel(termo_pesquisa,id_client);
@@ -364,9 +372,11 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
             return 1;
         
         users.put(username, pw.hashCode());
-        // new Thread(() -> {
+        new Thread(() -> {
+            lockFile2.lock();
             FileOps.writeToDisk(new File("./SM/users.bin"),users);
-        // }).start();
+            lockFile2.unlock();
+        }).start();
 
 
         return 0;
