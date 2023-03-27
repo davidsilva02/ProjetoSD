@@ -108,7 +108,6 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             this.socket=new MulticastSocket(PORT);
             this.group=InetAddress.getByName(MULTICAST_ADDRESS);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

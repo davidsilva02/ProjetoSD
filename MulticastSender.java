@@ -1,4 +1,5 @@
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
@@ -36,7 +37,6 @@ public class MulticastSender implements Runnable {
         try {
             this.searchModule= (RMI) Naming.lookup("rmi://localhost:1099/server");
         } catch (MalformedURLException | RemoteException | NotBoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             System.exit(0);
         }
@@ -45,7 +45,6 @@ public class MulticastSender implements Runnable {
             this.socket=new MulticastSocket();
             this.group=InetAddress.getByName(MULTICAST_ADDRESS);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -60,7 +59,6 @@ public class MulticastSender implements Runnable {
         try {
             number_of_barrels = searchModule.numberBarrels();
         } catch (RemoteException e) {
-            // TODO Auto-generated catch block
             number_of_barrels=-1;
             e.printStackTrace();
         }
@@ -70,6 +68,8 @@ public class MulticastSender implements Runnable {
                 JSOUPData j = l.take();
                 l.remove(j);
 
+                FileOps.writeToDisk(new File("./DW/l.bin"), this.l);
+
                 ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
                 ObjectOutputStream out;
                 try {
@@ -77,7 +77,6 @@ public class MulticastSender implements Runnable {
                     out.writeObject(j);
         
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
 

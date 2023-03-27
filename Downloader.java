@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -15,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 import org.jsoup.Jsoup;
 import org.w3c.dom.views.DocumentView;
@@ -37,15 +39,66 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI{
         try {
             this.server= (RMI) Naming.lookup("rmi://localhost:1099/server");
         } catch (MalformedURLException | RemoteException | NotBoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             System.exit(0);
         }
 
         //não existe um concurrent HashMap, entao temos de transformar isto num set
-        this.visited_urls = ConcurrentHashMap.newKeySet();
-        this.l = new LinkedBlockingQueue<>();
-        this.urlQueue = new LinkedBlockingDeque<>();
+        File folder = new File("./DW");
+        folder.mkdir();
+        
+        File visitedBin = new File("./DW/visitedUrls.bin");
+
+        if( !visitedBin.exists() ){
+            this.visited_urls = ConcurrentHashMap.newKeySet();
+            try {
+                visitedBin.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            this.visited_urls = (KeySetView<String,Boolean>)FileOps.readFromDisk(visitedBin);
+
+            if(this.visited_urls == null)
+                this.visited_urls = ConcurrentHashMap.newKeySet();
+        }
+
+
+        File urlBin = new File("./DW/urlQ.bin");
+
+        if( !urlBin.exists() ){
+            this.urlQueue = new LinkedBlockingDeque<>();
+            try {
+                urlBin.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            this.urlQueue = (LinkedBlockingDeque<String>)FileOps.readFromDisk(urlBin);
+
+            if(this.urlQueue == null)
+                this.urlQueue = new LinkedBlockingDeque<>();
+        }
+
+        
+        File lBin = new File("./DW/l.bin");
+
+        if( !lBin.exists() ){
+            this.l = new LinkedBlockingQueue<>();
+            try {
+                lBin.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            this.l = (LinkedBlockingQueue<JSOUPData>)FileOps.readFromDisk(lBin);
+
+            if(this.l == null)
+                this.l = new LinkedBlockingQueue<>();
+        }
 
     }
     public static void main(String[] args){
@@ -55,7 +108,6 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI{
         try {
             dw = new Downloader();
         } catch (RemoteException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

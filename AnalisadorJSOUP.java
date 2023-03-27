@@ -1,3 +1,4 @@
+import java.io.File;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -25,7 +26,7 @@ public class AnalisadorJSOUP implements Runnable {
     BlockingDeque<String> urlQueue;
 
 
-    public AnalisadorJSOUP(String threadName,BlockingQueue<JSOUPData> l, Set<String> visited_urls,BlockingDeque filaURL){
+    public AnalisadorJSOUP(String threadName,BlockingQueue<JSOUPData> l, Set<String> visited_urls,BlockingDeque<String> filaURL){
         super();
 
         // try {
@@ -85,6 +86,9 @@ public class AnalisadorJSOUP implements Runnable {
                         System.out.println("JA VISITOU");
                         newUrl=null;
                     }  
+
+                    FileOps.writeToDisk(new File("./DW/l.bin"), this.l);
+                    FileOps.writeToDisk(new File("./DW/urlQ.bin"), this.urlQueue);
 
                 }catch(InterruptedException e){
                     System.out.println("Exception taking an url from the queue: " +  e);

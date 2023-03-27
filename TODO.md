@@ -1,4 +1,4 @@
 # TODO
 - Fix o numero de barrels variar e o MulticastSender nao saber
 - Fix mudar o identificador do barrel no SearchModule para ser o nome introduzido no barrel ao inciar
-- Escrever fila de msgs por enviar e a queue de URLs para ficheiros
+- Recuperação do SearchModule.
