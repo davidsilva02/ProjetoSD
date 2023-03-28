@@ -5,11 +5,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
 
 public class FileOps {
 
     synchronized public static Boolean writeToDisk(File file, Object obj){
-
+		File copy = new File(file.getAbsolutePath() + ".copy.bin");
+		try {
+			Files.copy(file.toPath(), copy.toPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         try {
 			FileOutputStream f = new FileOutputStream(file);
 			ObjectOutputStream o = new ObjectOutputStream(f);
@@ -26,6 +33,8 @@ public class FileOps {
 			System.out.println("Error initializing stream");
             return false;
 		}
+
+		copy.delete();
 
         return true;
     }
@@ -47,7 +56,7 @@ public class FileOps {
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found");
 		} catch (IOException e) {
-			System.out.println("Error initializing stream: " + e);
+			System.out.println("Error initializing stream: "+ file.getPath()+" " + e  );
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

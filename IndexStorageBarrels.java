@@ -39,6 +39,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     ConcurrentHashMap <Integer,ArrayList<infoURL>> resultados_pesquisa;
     ReentrantLock lockFile;
     ReentrantLock lockFile1;
+    Integer countIterations = 0;
 
 
     public IndexStorageBarrels(String name) throws RemoteException{
@@ -49,63 +50,88 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         folder.mkdir();
         
         File indBin = new File(String.format("./ISB/index_%s.bin",name));
+        File copy = new File(indBin.getAbsolutePath() + ".copy.bin");
 
-        if( !indBin.exists() ){
-            ind = new ConcurrentHashMap<>();
-
+        if(!copy.exists() && indBin.exists()){
+            this.ind = (ConcurrentHashMap<String,HashSet<infoURL>>)FileOps.readFromDisk(indBin);
+        
+            if(this.ind == null)
+                this.ind  = new ConcurrentHashMap<String,HashSet<infoURL>>();
+        }
+        else if (copy.exists() && indBin.exists()){
+            this.ind = (ConcurrentHashMap<String,HashSet<infoURL>>)FileOps.readFromDisk(copy);
+            if(this.ind == null){
+                if(indBin.exists())
+                    this.ind = (ConcurrentHashMap<String,HashSet<infoURL>>)FileOps.readFromDisk(indBin);
+                else
+                    this.ind = new ConcurrentHashMap<String,HashSet<infoURL>>();
+            }
+        }
+        //le do disco
+        else{
+            this.ind = new ConcurrentHashMap<String,HashSet<infoURL>>();
             try {
                 indBin.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        else{
-            ind = (ConcurrentHashMap<String,HashSet<infoURL>>)FileOps.readFromDisk(indBin);
-
-            if(ind == null)
-                ind = new ConcurrentHashMap<String,HashSet<infoURL>>();
-
-        }
 
         File urlsBin = new File(String.format("./ISB/urls_%s.bin",name));
+        copy = new File(urlsBin.getAbsolutePath() + ".copy.bin");
 
-        if( !urlsBin.exists() ){
-            urls = new ConcurrentHashMap<>();
 
+        if(!copy.exists() && urlsBin.exists()){
+            this.urls = (ConcurrentHashMap<String,infoURL>)FileOps.readFromDisk(urlsBin);
+        
+            if(this.urls == null)
+                this.urls  = new ConcurrentHashMap<String,infoURL>();
+        }
+        else if (copy.exists() && urlsBin.exists()){
+            this.urls = (ConcurrentHashMap<String,infoURL>)FileOps.readFromDisk(copy);
+            if(this.urls == null){
+                if(urlsBin.exists())
+                    this.urls = (ConcurrentHashMap<String,infoURL>)FileOps.readFromDisk(urlsBin);
+                else
+                    this.urls = new ConcurrentHashMap<String,infoURL>();
+            }
+        }
+        //le do disco
+        else{
+            this.urls = new ConcurrentHashMap<String,infoURL>();
             try {
                 urlsBin.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        else{
-            urls = (ConcurrentHashMap<String,infoURL>)FileOps.readFromDisk(urlsBin);
 
-            if(urls == null)
-                urls = new ConcurrentHashMap<>();
-
-        }
 
         File searchResultsBin = new File(String.format("./ISB/searchResults_%s.bin",name));
+        copy=new File(searchResultsBin.getAbsolutePath() + ".copy.bin");
 
-        if( !searchResultsBin.exists() ){
-            resultados_pesquisa = new ConcurrentHashMap<>();
-
+        if (copy.exists() && searchResultsBin.exists()) {
+            resultados_pesquisa = (ConcurrentHashMap <Integer,ArrayList<infoURL>>)FileOps.readFromDisk(copy);
+            if(resultados_pesquisa == null){
+                if(searchResultsBin.exists())
+                    resultados_pesquisa = (ConcurrentHashMap <Integer,ArrayList<infoURL>>)FileOps.readFromDisk(searchResultsBin);
+                else
+                    resultados_pesquisa = new ConcurrentHashMap<>();
+            }
+        }
+        else if(!copy.exists() && searchResultsBin.exists()){
+            resultados_pesquisa = (ConcurrentHashMap <Integer,ArrayList<infoURL>>)FileOps.readFromDisk(searchResultsBin);
+            if(resultados_pesquisa == null)
+                resultados_pesquisa = new ConcurrentHashMap<>();
+        }
+        else{
+            resultados_pesquisa = new ConcurrentHashMap<Integer,ArrayList<infoURL>>();
             try {
                 searchResultsBin.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        else{
-            resultados_pesquisa = (ConcurrentHashMap <Integer,ArrayList<infoURL>>)FileOps.readFromDisk(searchResultsBin);
-
-            if(resultados_pesquisa == null)
-                resultados_pesquisa = new ConcurrentHashMap<Integer,ArrayList<infoURL>>();
-
-        }
-
-
 
         try {
             this.socket=new MulticastSocket(PORT);
@@ -115,7 +141,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         }
 
         try {
-            this.server= (RMI) Naming.lookup("rmi://localhost:1099/server");
+            this.server= (RMI) Naming.lookup("rmi://localhost:3366/server");
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
@@ -148,7 +174,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
          //envia ao server que existe um barrel disponivel
          try {
-            server.AvailableBarrel(this);
+            server.addBarrel(this,this.barrelName);
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -304,13 +330,17 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                     // ConcurrentHashMap<?,?> copyUrls = new ConcurrentHashMap<>(urls);
 
                     new Thread(() -> {
-                        lockFile.lock();
-                        FileOps.writeToDisk(new File(String.format("./ISB/index_%s.bin",barrelName)),ind);
-                        FileOps.writeToDisk(new File(String.format("./ISB/urls_%s.bin",barrelName)),urls);
-                        lockFile.unlock();
+                        if(countIterations > 24){
+                            lockFile.lock();
+                            FileOps.writeToDisk(new File(String.format("./ISB/index_%s.bin",barrelName)),ind);
+                            FileOps.writeToDisk(new File(String.format("./ISB/urls_%s.bin",barrelName)),urls);
+                            lockFile.unlock();
+                            countIterations = 0;
+                        }
                     }).start();
                 }
 
+                countIterations++;
             }
     }
     /**
@@ -348,7 +378,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         //marca barrel como ocupado
         //envia ao server que o barrel ja nao esta disponivel
         // try {
-        //     server.notAvailableBarrel(this);
+        //     server.notAvailableBarrel(this,this.barrelName);
         // } catch (RemoteException e) {
         //     // TODO Auto-generated catch block
         //     e.printStackTrace();
@@ -356,6 +386,8 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
         // System.out.printf("PESQUISA PELO TERMO %s\n",termo_pesquisa);
         // System.out.println(ind.get(termo_pesquisa));
+
+        server.makeBarrelUnavailable(this.barrelName);
 
         // procurar pelo termo
         String[] termos = termo_pesquisa.split(" ");
@@ -399,9 +431,12 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             sortedTermSearch=new ArrayList<infoURL>(sortedTermSearch.subList(0, 10));
         }
         new Thread(() -> {
-            lockFile1.lock();
-            FileOps.writeToDisk(new File(String.format("./ISB/searchResults_%s.bin",barrelName)), (resultados_pesquisa));
-            lockFile1.unlock();
+            if(countIterations > 25){
+                lockFile1.lock();
+                FileOps.writeToDisk(new File(String.format("./ISB/searchResults_%s.bin",barrelName)), (resultados_pesquisa));
+                lockFile1.unlock();
+                countIterations = 0;
+            }
         }).start();
         // if(termo_pesquisa.equals("ABC")) result="COM RESULTADOS";
         // else result="SEM RESULTADOS";
@@ -413,6 +448,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         //     // TODO Auto-generated catch block
         //     e.printStackTrace();
         // }
+        server.makeBarrelAvailable(this.barrelName);
         if(sortedTermSearch.size()>0) return sortedTermSearch;
         return null;           
 }

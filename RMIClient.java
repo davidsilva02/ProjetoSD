@@ -21,7 +21,7 @@ public class RMIClient {
     public RMIClient(){
         this.sc=new Scanner(System.in);
         try {
-            this.server= (RMI) Naming.lookup("rmi://localhost:1099/server");
+            this.server= (RMI) Naming.lookup("rmi://localhost:3366/server");
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
