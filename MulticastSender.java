@@ -31,6 +31,7 @@ public class MulticastSender implements Runnable {
     AtomicInteger number_barrels;
     Object lock_changes;
     ReentrantLock lockFile;
+    Integer countIterations = 0;
 
     public MulticastSender(String name, BlockingQueue<JSOUPData> l,AtomicInteger number_barrels, Object lock_changes){
         
@@ -41,7 +42,7 @@ public class MulticastSender implements Runnable {
 
         // Get the reference to the server to future RMI calls
         try {
-            this.searchModule= (RMI) Naming.lookup("rmi://localhost:1099/server");
+            this.searchModule= (RMI) Naming.lookup("rmi://localhost:3366/server");
         } catch (MalformedURLException | RemoteException | NotBoundException e) {
             e.printStackTrace();
             System.exit(0);
@@ -88,9 +89,12 @@ public class MulticastSender implements Runnable {
                     l.remove(j);
                 }
                 new Thread(() -> {
-                    lockFile.lock();
-                    FileOps.writeToDisk(new File("./DW/l.bin"), (this.l));
-                    lockFile.unlock();
+                    if(countIterations > 25){
+                        lockFile.lock();
+                        FileOps.writeToDisk(new File("./DW/l.bin"), (this.l));
+                        lockFile.unlock();
+                        countIterations = 0;
+                    }
                 }).start();
 
 
@@ -313,6 +317,7 @@ public class MulticastSender implements Runnable {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            countIterations++;
         }
     }
     

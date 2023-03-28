@@ -28,7 +28,7 @@ public class AnalisadorJSOUP implements Runnable {
     String threadName;
     BlockingDeque<String> urlQueue;
     ReentrantLock lockFile1;
-
+    Integer countIterations = 0;
 
 
     public AnalisadorJSOUP(String threadName,BlockingQueue<JSOUPData> l, Set<String> visited_urls,BlockingDeque<String> filaURL,ReentrantLock lockFile1){
@@ -47,7 +47,7 @@ public class AnalisadorJSOUP implements Runnable {
 
         // Get the reference to the server to future RMI calls
         try {
-            this.server= (RMI) Naming.lookup("rmi://localhost:1099/server");
+            this.server= (RMI) Naming.lookup("rmi://localhost:3366/server");
         } catch (MalformedURLException | RemoteException | NotBoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -92,9 +92,12 @@ public class AnalisadorJSOUP implements Runnable {
                         visited_urls.add(newUrl);
 
                         new Thread(() -> {
-                            lockFile1.lock();
-                            FileOps.writeToDisk(new File("./DW/visitedURLS.bin"), (visited_urls));
-                            lockFile1.unlock();
+                            if(countIterations > 24){
+                                lockFile1.lock();
+                                FileOps.writeToDisk(new File("./DW/visitedURLS.bin"), (visited_urls));
+                                lockFile1.unlock();
+                                countIterations = 0;
+                            }
                         }).start();
 
                     }
@@ -104,10 +107,13 @@ public class AnalisadorJSOUP implements Runnable {
                     }
                     
                     new Thread(() -> {
-                        lockFile1.lock();
-                        FileOps.writeToDisk(new File("./DW/l.bin"), (l));
-                        FileOps.writeToDisk(new File("./DW/urlQ.bin"),(urlQueue));
-                        lockFile1.unlock();
+                        if(countIterations > 24){
+                            lockFile1.lock();
+                            FileOps.writeToDisk(new File("./DW/l.bin"), (l));
+                            FileOps.writeToDisk(new File("./DW/urlQ.bin"),(urlQueue));
+                            lockFile1.unlock();
+                            countIterations = 0;
+                        }
                     }).start();
 
 
@@ -333,6 +339,7 @@ public class AnalisadorJSOUP implements Runnable {
         }
 
 
+            countIterations++;
         }
 
     }

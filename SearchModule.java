@@ -101,7 +101,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         SearchModule h = null;
 		try {
             h = new SearchModule();
-			LocateRegistry.createRegistry(1099).rebind("server", h);
+			LocateRegistry.createRegistry(3366).rebind("server", h);
 			System.out.println("RMI SERVER ready.");
 		} catch (RemoteException re) {
 			System.out.println("Exception in RMISERVER.main: " + re);
@@ -143,6 +143,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         searches.sort(Comparator.comparing(Searched::getNumSearches));
 
         new Thread(() -> {
+            
             lockFile1.lock();
             FileOps.writeToDisk(new File("./SM/searches.bin"), searches);
             lockFile1.unlock();
