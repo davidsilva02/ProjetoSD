@@ -26,6 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRMI{
     private String MULTICAST_ADDRESS = "224.3.2.1";
@@ -246,8 +248,20 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                     opt=buf[0];
                 }
              
-                byte data[] = new byte [recv.getLength()-1];
-                System.arraycopy(recv.getData(), 1, data, 0, recv.getLength()-1);
+                byte dataToUncompress[] = new byte [recv.getLength()-1];
+                System.arraycopy(recv.getData(), 1, dataToUncompress, 0, recv.getLength()-1);
+
+                // descomprime os dados
+                Inflater decompressor = new Inflater();
+                decompressor.setInput(dataToUncompress);
+                byte data[] = new byte[tamanho_a_receber];
+                
+                try {
+                    decompressor.inflate(data);
+                } catch (DataFormatException e) {
+                    e.printStackTrace();
+                }
+
 
                 InetAddress senderAddress = recv.getAddress();
                 int senderPort = recv.getPort();

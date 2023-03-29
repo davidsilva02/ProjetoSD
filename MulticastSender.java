@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.zip.Deflater;
 
 import org.jsoup.Jsoup;
 
@@ -108,21 +109,34 @@ public class MulticastSender implements Runnable {
                     e.printStackTrace();
                 }
 
-                byte class_send [] = byteOut.toByteArray();
-                int tamanho_envio=class_send.length;
+                byte beforeCompress [] = byteOut.toByteArray();
 
-                if(tamanho_envio<64000){
+                //compressing object
+                Deflater compressor = new Deflater(Deflater.BEST_SPEED);
+                compressor.setInput(beforeCompress);
+                compressor.finish();
+
+                byte class_send [] = new byte[beforeCompress.length];
+                int tamanho_envio = compressor.deflate(class_send);
+
+                //if(tamanho_envio<64000){
                     while(true){
 
                         //enviar tamanho da classe que vamos mandar
                         //se 0 vamos enviar tamanho
-                        byte buf[]=Integer.toString(tamanho_envio).getBytes();
+                        byte buf[]=Integer.toString(beforeCompress.length).getBytes();
+
+
+
                         byte opt[]={0};
                         byte [] send = new byte[buf.length + 1];
         
                         //copia para o primeiro byte a opcao,de seguida copia o buf para os restantes bytes
                         System.arraycopy(opt,0, send, 0, 1);
                         System.arraycopy(buf, 0,send,1, buf.length);
+
+                        //
+                        
         
                         DatagramPacket packet = new DatagramPacket(send, send.length, group, PORT);
                         try {
@@ -215,10 +229,10 @@ public class MulticastSender implements Runnable {
         
                             //enviar JSOUPData com opcao 1
                             opt[0]=1;
-                            send = new byte[class_send.length + 1];
+                            send = new byte[tamanho_envio + 1];
                             //copia para o primeiro byte a opcao,de seguida copia o buf para os restantes bytes
                             System.arraycopy(opt,0, send, 0, 1);
-                            System.arraycopy(class_send, 0,send,1, class_send.length);
+                            System.arraycopy(class_send, 0,send,1, tamanho_envio);
                             packet = new DatagramPacket(send, send.length, group, PORT);
                             try {
                                 socket.send(packet);
@@ -306,8 +320,8 @@ public class MulticastSender implements Runnable {
                             break;
                     }
                         
-                    }
-                    else System.out.println("NAO FOI POSSIVEL ENVIAR - TAMANHO EXCEDIDO");
+                    //}
+                    //else System.out.println("NAO FOI POSSIVEL ENVIAR - TAMANHO EXCEDIDO");
     
                 // }
                 // catch(SocketException.)
