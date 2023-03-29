@@ -10,7 +10,6 @@ public class RMIClient {
     Scanner sc;
     RMI server;
     String loggedUser;
-    Boolean logged;
 
     public RMIClient() {
         this.sc = new Scanner(System.in);
@@ -20,7 +19,7 @@ public class RMIClient {
             e.printStackTrace();
             System.exit(0);
         }
-        logged=false;
+        loggedUser=null;
     }
 
     public static void main(String[] args) {
@@ -131,7 +130,7 @@ public class RMIClient {
                     break;
 
                 case 3: // GET LIST OF PAGES THAT REFERENCE THE RECEIVED URL
-                    if(!logged) {System.out.println("ACESSO RESERVADO: FAZER LOGIN OU REGISTO!"); break;}
+                    if(loggedUser==null) {System.out.println("ACESSO RESERVADO: FAZER LOGIN OU REGISTO!"); break;}
 
                     input = sc.nextLine();
 
@@ -154,7 +153,7 @@ public class RMIClient {
                     break;
 
                 case 4: // STATUS2
-                    if(!logged){System.out.println("ACESSO RESERVADO: FAZER LOGIN OU REGISTO!"); break;}
+                    if(loggedUser==null){System.out.println("ACESSO RESERVADO: FAZER LOGIN OU REGISTO!"); break;}
                     while (!flagWorked) {
                         try {
                             HashMap<String, Component> components = server.getComponents();
@@ -215,7 +214,7 @@ public class RMIClient {
                         System.out.println("Erro. Username ou password inválidos.");
                     else{
                         System.out.println("Login efetuado com sucesso!");
-                        logged=true;}
+                        loggedUser=username;}
                     break;
 
                 case 6:
@@ -230,7 +229,7 @@ public class RMIClient {
                         try {
                             if (server.makeRegister(un, pass) == 0){
                                 System.out.println("Utilizador registado com sucesso!");
-                                logged=true;}
+                                loggedUser=un;}
                             else
                                 System.out.println("Erro. Utilizador já registado.");
                             flagWorked = true;
