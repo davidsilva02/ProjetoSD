@@ -1,3 +1,3 @@
 # TODO
-- Recuperação do cliente
-- Relatório
+- iteration counter outside thread
+- login/registo
