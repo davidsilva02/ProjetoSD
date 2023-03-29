@@ -35,9 +35,11 @@ public class RMIClient {
 
     public void start(){
         System.out.println("CLIENT A CORRER...");
-
+        
         String input;
         while(true){
+        Boolean success = false;
+        Integer tentativas=0; 
            int opt=menu();
 
            switch(opt){
@@ -52,7 +54,8 @@ public class RMIClient {
                 break;
 
             case 2: // MAKE A SEARCH
-                input = sc.nextLine();
+            input = sc.nextLine();
+               while(!success && tentativas<=5) {
                try {
                    ArrayList<infoURL> result=server.resultadoPesquisa(input,this.hashCode());
                    int num_pagina=1;
@@ -116,13 +119,18 @@ public class RMIClient {
                     }  
                    }
                    else System.out.println("SEM RESULTADOS");
+                   success=true;
                } catch (RemoteException e) {
                    e.printStackTrace();
+                   success=false;
+                   tentativas++;
                }
+            }
                break;
 
             case 5: // GET LIST OF PAGES THAT REFERENCE THE RECEIVED URL
                 input = sc.nextLine();
+              while(!success && tentativas<=5) {
               try {
                   List<infoURL> result= server.getReferencesList(input);
                   
@@ -132,13 +140,17 @@ public class RMIClient {
                     }
                   else
                     System.out.println("URL não indexado!!");
+                    success=true;
 
               } catch (Exception e) {
                   e.printStackTrace();
-              }
+                  success=false;
+                  tentativas++;
+              }}
               break;
 
             case 6: // STATUS2
+            while(!success && tentativas<=5) {
                 try {
                     HashMap<String,Component> components = server.getComponents();
                     ArrayList<Searched> topSearchs = server.getTopSearchs();
@@ -164,12 +176,15 @@ public class RMIClient {
                     for(Searched searchObj: topSearchs)
                         System.out.println(String.format("%d - %s", searchObj.getNumSearches(), searchObj.getTerm()));
                     System.out.println(" -------------------");
+                    success=true;
 
                     // System.out.println(result);
                     
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
+                    success=false;
+                    tentativas+=1;
+                }}
                 break;
 
            case 7:
@@ -179,21 +194,27 @@ public class RMIClient {
               String username = sc.nextLine();
               System.out.println("Password: ");
               String pw = sc.nextLine();
-
+              while(!success && tentativas<=5) {
                 try {
                     loggedUser = server.makeLogin(username, pw);
+                    success=true;
                 } catch (RemoteException e) {
                     e.printStackTrace();
+                    tentativas++;
                 }
-
-              if(loggedUser == null)
-                System.out.println("Erro. Username ou password inválidos.");
-              else
-                System.out.println("Login efetuado com sucesso!");
-                break;
+            }
+            if(success){
+                if(loggedUser == null)
+                  System.out.println("Erro. Username ou password inválidos.");
+                else
+                  System.out.println("Login efetuado com sucesso!");
+                  break;
+            }
 
             case 8:
                 //GET INTPUT
+                while(!success && tentativas<=5) {
+
                 System.out.println("-- Registering a new user --");
                 System.out.println("Username: ");
                 String un = sc.nextLine();
@@ -205,10 +226,13 @@ public class RMIClient {
                         System.out.println("Utilizador registado com sucesso!");
                     else
                         System.out.println("Erro. Utilizador já registado.");
+                    success=true;
                 } catch (RemoteException e) {
                     e.printStackTrace();
+                    success=false;
+                    tentativas++;
                 }
-
+            }
                break;
 
            case 0: // CLOSE
