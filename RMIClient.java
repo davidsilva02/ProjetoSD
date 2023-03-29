@@ -10,6 +10,7 @@ public class RMIClient {
     Scanner sc;
     RMI server;
     String loggedUser;
+    Boolean logged;
 
     public RMIClient() {
         this.sc = new Scanner(System.in);
@@ -19,7 +20,7 @@ public class RMIClient {
             e.printStackTrace();
             System.exit(0);
         }
-        loggedUser = null;
+        logged=false;
     }
 
     public static void main(String[] args) {
@@ -129,7 +130,9 @@ public class RMIClient {
                     }
                     break;
 
-                case 5: // GET LIST OF PAGES THAT REFERENCE THE RECEIVED URL
+                case 3: // GET LIST OF PAGES THAT REFERENCE THE RECEIVED URL
+                    if(!logged) {System.out.println("ACESSO RESERVADO: FAZER LOGIN OU REGISTO!"); break;}
+
                     input = sc.nextLine();
 
                     while (!flagWorked) {
@@ -150,8 +153,8 @@ public class RMIClient {
                     }
                     break;
 
-                case 6: // STATUS2
-
+                case 4: // STATUS2
+                    if(!logged){System.out.println("ACESSO RESERVADO: FAZER LOGIN OU REGISTO!"); break;}
                     while (!flagWorked) {
                         try {
                             HashMap<String, Component> components = server.getComponents();
@@ -191,7 +194,7 @@ public class RMIClient {
                     }
                     break;
 
-                case 7:
+                case 5:
                     // GET INTPUT
                     System.out.println("-- Making Login --");
                     System.out.println("Username: ");
@@ -210,11 +213,12 @@ public class RMIClient {
 
                     if (loggedUser == null)
                         System.out.println("Erro. Username ou password inválidos.");
-                    else
+                    else{
                         System.out.println("Login efetuado com sucesso!");
+                        logged=true;}
                     break;
 
-                case 8:
+                case 6:
                     // GET INTPUT
                     System.out.println("-- Registering a new user --");
                     System.out.println("Username: ");
@@ -224,8 +228,9 @@ public class RMIClient {
 
                     while (!flagWorked) {
                         try {
-                            if (server.makeRegister(un, pass) == 0)
+                            if (server.makeRegister(un, pass) == 0){
                                 System.out.println("Utilizador registado com sucesso!");
+                                logged=true;}
                             else
                                 System.out.println("Erro. Utilizador já registado.");
                             flagWorked = true;
