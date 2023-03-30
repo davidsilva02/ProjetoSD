@@ -47,6 +47,7 @@ public class FileOps {
 	  public static Object readFromDisk(File file) {
 
 		Object result = null;
+	  	//System.out.println(file.getAbsolutePath());
 
 		try {
 			FileInputStream fi = new FileInputStream(file);
@@ -61,7 +62,7 @@ public class FileOps {
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found");
 		} catch (IOException e) {
-			System.out.println("Error initializing stream: " + file.getPath() + " " + e);
+			//System.out.println("Error initializing stream: " + file.getPath() + " " + e);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

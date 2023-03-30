@@ -39,8 +39,12 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         super();
 
         this.barrelName = name;
+
+        //Create folder
         File folder = new File("./ISB");
         folder.mkdir();
+
+        File[] listFiles = new File("./ISB").listFiles();
 
         File indBin = new File(String.format("./ISB/index_%s.bin", name));
         File copy = new File(indBin.getAbsolutePath() + ".copy.bin");
@@ -51,21 +55,46 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             if (this.ind == null)
                 this.ind = new ConcurrentHashMap<String, HashSet<infoURL>>();
         } else if (copy.exists() && indBin.exists()) {
+
             this.ind = (ConcurrentHashMap<String, HashSet<infoURL>>) FileOps.readFromDisk(copy);
-            if (this.ind == null) {
-                if (indBin.exists())
+            if (this.ind == null && indBin.exists()) {
                     this.ind = (ConcurrentHashMap<String, HashSet<infoURL>>) FileOps.readFromDisk(indBin);
-                else
-                    this.ind = new ConcurrentHashMap<String, HashSet<infoURL>>();
             }
+
+            if(this.ind == null)
+                this.ind = new ConcurrentHashMap<String, HashSet<infoURL>>();
         }
         // le do disco
         else {
-            this.ind = new ConcurrentHashMap<String, HashSet<infoURL>>();
-            try {
-                indBin.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
+            Boolean flagFoundOther = false;
+
+            //primeiro averiguar já existe alguem barrel criado
+            for (int i = 0; i < listFiles.length; i++) {
+                if (listFiles[i].isFile()) {
+                    String fileName = listFiles[i].getName();
+                    if (fileName.startsWith("index_") && fileName.endsWith(".bin")) {
+                        //TENTAR RECUPERAR
+                        //System.out.println(String.format("File name: %s",fileName));
+                        this.ind = (ConcurrentHashMap<String, HashSet<infoURL>>) FileOps.readFromDisk(new File(String.format("ISB/%s",fileName)));
+
+                        if(this.ind != null){
+                            flagFoundOther = true;
+                            break;
+                        }
+
+
+                    }
+                }
+            }
+
+
+            if(!flagFoundOther) {
+                this.ind = new ConcurrentHashMap<String, HashSet<infoURL>>();
+                try {
+                    indBin.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -79,20 +108,44 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 this.urls = new ConcurrentHashMap<String, infoURL>();
         } else if (copy.exists() && urlsBin.exists()) {
             this.urls = (ConcurrentHashMap<String, infoURL>) FileOps.readFromDisk(copy);
-            if (this.urls == null) {
-                if (urlsBin.exists())
+            if (this.urls == null && urlsBin.exists()) {
                     this.urls = (ConcurrentHashMap<String, infoURL>) FileOps.readFromDisk(urlsBin);
-                else
-                    this.urls = new ConcurrentHashMap<String, infoURL>();
             }
+
+            if(this.urls == null)
+                this.urls = new ConcurrentHashMap<String, infoURL>();
+
         }
         // le do disco
         else {
-            this.urls = new ConcurrentHashMap<String, infoURL>();
-            try {
-                urlsBin.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
+            Boolean flagFoundOther = false;
+            System.out.println("AQUI2!!!");
+
+            //primeiro averiguar já existe alguem barrel criado
+            for (int i = 0; i < listFiles.length; i++) {
+                if (listFiles[i].isFile()) {
+                    String fileName = listFiles[i].getName();
+                    if (fileName.startsWith("urls_") && fileName.endsWith(".bin")) {
+                        //TENTAR RECUPERAR
+                        this.urls = (ConcurrentHashMap<String, infoURL>) FileOps.readFromDisk(new File(String.format("ISB/%s",fileName)));
+
+                        if(this.urls != null){
+                            flagFoundOther = true;
+                            break;
+                        }
+
+
+                    }
+                }
+            }
+
+            if(!flagFoundOther) {
+                this.urls = new ConcurrentHashMap<String, infoURL>();
+                try {
+                    urlsBin.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -101,22 +154,46 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
         if (copy.exists() && searchResultsBin.exists()) {
             resultados_pesquisa = (ConcurrentHashMap<Integer, ArrayList<infoURL>>) FileOps.readFromDisk(copy);
-            if (resultados_pesquisa == null) {
-                if (searchResultsBin.exists())
+            if (resultados_pesquisa == null && searchResultsBin.exists()){
                     resultados_pesquisa = (ConcurrentHashMap<Integer, ArrayList<infoURL>>) FileOps.readFromDisk(searchResultsBin);
-                else
-                    resultados_pesquisa = new ConcurrentHashMap<>();
             }
+
+            if(resultados_pesquisa == null)
+                resultados_pesquisa = new ConcurrentHashMap<>();
+
         } else if (!copy.exists() && searchResultsBin.exists()) {
             resultados_pesquisa = (ConcurrentHashMap<Integer, ArrayList<infoURL>>) FileOps.readFromDisk(searchResultsBin);
             if (resultados_pesquisa == null)
                 resultados_pesquisa = new ConcurrentHashMap<>();
         } else {
-            resultados_pesquisa = new ConcurrentHashMap<Integer, ArrayList<infoURL>>();
-            try {
-                searchResultsBin.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
+            Boolean flagFoundOther = false;
+            System.out.println("AQUI3!!!");
+
+            //primeiro averiguar já existe alguem barrel criado
+            for (int i = 0; i < listFiles.length; i++) {
+                if (listFiles[i].isFile()) {
+                    String fileName = listFiles[i].getName();
+                    if (fileName.startsWith("searchResults_") && fileName.endsWith(".bin")) {
+                        //TENTAR RECUPERAR
+                        this.resultados_pesquisa = (ConcurrentHashMap<Integer, ArrayList<infoURL>>) FileOps.readFromDisk(new File(String.format("ISB/%s",fileName)));
+
+                        if(this.resultados_pesquisa != null){
+                            flagFoundOther = true;
+                            break;
+                        }
+
+
+                    }
+                }
+            }
+
+            if(!flagFoundOther) {
+                resultados_pesquisa = new ConcurrentHashMap<Integer, ArrayList<infoURL>>();
+                try {
+                    searchResultsBin.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
