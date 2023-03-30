@@ -91,14 +91,14 @@ public class AnalisadorJSOUP implements Runnable {
                     if(!visited_urls.contains(newUrl)) {
                         visited_urls.add(newUrl);
 
+                        if(countIterations == 25){
                         new Thread(() -> {
-                            if(countIterations > 24){
                                 lockFile1.lock();
-                                FileOps.ToDisk(new File("./DW/visitedURLS.bin"), (visited_urls));
+                                FileOps.writeToDisk(new File("./DW/visitedURLS.bin"), (visited_urls));
                                 lockFile1.unlock();
-                                countIterations = 0;
-                            }
-                        }).start();
+                            }).start();
+                            countIterations = 0;
+                        }
 
                     }
                     else {
@@ -106,35 +106,20 @@ public class AnalisadorJSOUP implements Runnable {
                         newUrl=null;
                     }
                     
+                    if(countIterations == 25){
                     new Thread(() -> {
-                        if(countIterations > 24){
                             lockFile1.lock();
-                            FileOps.ToDisk(new File("./DW/l.bin"), (l));
-                            FileOps.ToDisk(new File("./DW/urlQ.bin"),(urlQueue));
+                            FileOps.writeToDisk(new File("./DW/l.bin"), (l));
+                            FileOps.writeToDisk(new File("./DW/urlQ.bin"),(urlQueue));
                             lockFile1.unlock();
-                            countIterations = 0;
-                        }
-                    }).start();
+                        }).start();
+                        countIterations = 0;
+                    }
 
 
                 }catch(InterruptedException e){
                     System.out.println("Exception taking an url from the queue: " +  e);
                 }
-
-                // try{
-                //     //receive new url from the queue
-                //     // newUrl = server.getUrl();
-                //     //se nao existir, adicionamos que foi visitado
-                //     if(!visited_urls.contains(newUrl)) visited_urls.add(newUrl);
-                //     //se o url já tiver sido visitado, nao fazemos nada, logo escolhemos outro url
-                //     else {
-                //         System.out.println("JA VISITOU");
-                //         newUrl=null;
-                //     }  
-                // }catch(Exception e){
-                //     //System.out.println("Exception on downloader: " + e.getMessage());
-                // }
-
             }
 
             try {
@@ -171,17 +156,6 @@ public class AnalisadorJSOUP implements Runnable {
                 while (tokens.hasMoreElements()){
                     // System.out.println(tokens.nextToken().toLowerCase());
                     j.addTermo(tokens.nextToken().toLowerCase());
-                    // //adicionar ao index
-                    // if( !indx.containsKey(tokens.nextToken())){ //não está no index
-                    //     HashSet<String> tempUrls = new HashSet<String>();
-                    //     tempUrls.add(newUrl);
-                    //     indx.put(tokens.nextToken(),tempUrls);
-                    // }
-                    // else{ //está no index
-                    //     HashSet<String> tempUrls = indx.get(tokens.nextToken());
-                    //     tempUrls.add(newUrl);
-                    //     indx.put(tokens.nextToken(),tempUrls);
-                    // }
                 } 
 
                 //get urls
@@ -196,17 +170,9 @@ public class AnalisadorJSOUP implements Runnable {
                             System.out.println("Exception puting an url in the queue: " +  e);
                         }
                     }
-                    // server.putUrl(link.attr("abs:href")); //não seria melhor fzer isto só no fim? ns
-                    // System.out.println(link.text() + "\n" + link.attr("abs:href") + "\n");
-                    // urls.add(link.attr("abs:href"));
+                   
                 }
                 
-                // //FAZER OQ COM OS URLS NOVOS?!?!!?
-                // //METER NA FILA?
-                // for(String str: urls)
-                //     server.putUrl(str);
-                
-
             }
             catch (Exception e) 
             {
@@ -214,131 +180,14 @@ public class AnalisadorJSOUP implements Runnable {
                 e.printStackTrace();
             }
 
-            
-        //     //envia dados para colocar nos Barrels por multicast
-        //     for(int i = 0; i < numTries || ack; i++){
-        //         try {
-        //             //Convert HashMap to ByteArray
-        //             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        //             ObjectOutputStream out = new ObjectOutputStream(byteOut);
-        //             out.Object(indx);
-        //             byte buffer [] = byteOut.toByteArray();
-                    
-        //             //send the hashmap (index) to the ISB
-        //             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-        //             socket.send(packet);
-
-        //             //timeout e get ack
-        //             socket.setSoTimeout(timeout);
-
-        //             DatagramPacket ackDgram = new DatagramPacket(buffer, buffer.length);	
-		// 			socket.receive(ackDgram);
-
-        //             ack = true;
-
-        //         } catch (Exception e) {
-        //             e.printStackTrace();
-        //         }
-        //     }
-        // }
-
         //TODO: Algumas excecoes ocorrem em cima e manda o objeto a null
         if(j!=null) l.add(j);
-        // if(j!=null){
-        //     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        //     ObjectOutputStream out;
-        //     try {
-        //         out = new ObjectOutputStream(byteOut);
-        //         out.Object(j);
-    
-        //     } catch (IOException e) {
-        //         // TODO Auto-generated catch block
-        //         e.printStackTrace();
-        //     }
-    
-        //     byte buffer [] = byteOut.toByteArray();
-        //     int tamanho_envio=buffer.length;
 
-        //     //mandar tamanho
-        //     byte buf[]=Integer.toString(tamanho_envio).getBytes();
-        //     DatagramPacket packet = new DatagramPacket(buf, buf.length, group, PORT);
-        //     try {
-        //         socket.send(packet);
-        //     } catch (IOException e) {
-        //         // TODO Auto-generated catch block
-        //         e.printStackTrace();
-        //     }
-            
-        //     //TODO: abordagem ainda nao esta completa, temos de saber quantos barrels temos, e a busca por resposta tem de ter limites (??)
-        //     //esperamos que todos recebam o tamanho
-        //     HashSet<Integer> hashs = new HashSet<>();
-        //     int number_of_barrels=1;
-        //     while(hashs.size()!=number_of_barrels){
-        //         byte buffe[]=new byte[20];
-        //         DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
-                
-        //         // try {
-        //         //     socket.setSoTimeout(10000);
-        //         // } catch (SocketException e) {
-        //         //     // TODO Auto-generated catch block
-        //         //     // e.printStackTrace();
-        //         // }
-    
-        //         try {
-        //             socket.receive(rec);
-        //         } catch (IOException e) {
-        //             // TODO Auto-generated catch block
-        //             e.printStackTrace();
-        //         }
-                
-        //        String num = new String(rec.getData(), 0, rec.getLength());
-        //        hashs.add(Integer.parseInt(num));
-        //     }
-
-        //     System.out.println("TODOS RECEBERAM O TAMANHO");
-
-        //     //enviar JSOUPData
-        //     packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-        //     try {
-        //         socket.send(packet);
-        //     } catch (IOException e) {
-        //         // TODO Auto-generated catch block
-        //         e.printStackTrace();
-        //     }
-            
-        //     hashs = new HashSet<>();
-        //     number_of_barrels=1;
-        //     while(hashs.size()!=number_of_barrels){
-        //         byte buffe[]=new byte[20];
-        //         DatagramPacket rec = new DatagramPacket(buffe, buffe.length);
-                
-        //         // try {
-        //         //     socket.setSoTimeout(10000);
-        //         // } catch (SocketException e) {
-        //         //     // TODO Auto-generated catch block
-        //         //     // e.printStackTrace();
-        //         // }
-    
-        //         try {
-        //             socket.receive(rec);
-        //         } catch (IOException e) {
-        //             // TODO Auto-generated catch block
-        //             e.printStackTrace();
-        //         }
-                
-        //        String num = new String(rec.getData(), 0, rec.getLength());
-        //     }
-    
-
-        //     System.out.println("TODOS RECEBERAM");
-        //     }
         try {
             server.makeDownloaderAvailable(this.threadName);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
-
             countIterations++;
         }
 

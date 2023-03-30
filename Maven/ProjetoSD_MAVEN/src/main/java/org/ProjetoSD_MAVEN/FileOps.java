@@ -8,44 +8,46 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ConcurrentModificationException;
 
 public class FileOps {
 
-    synchronized public static Boolean ToDisk(File file, Object obj){
+	  public static Boolean writeToDisk(File file, Object obj) {
 		File copy = new File(file.getAbsolutePath() + ".copy.bin");
 		try {
-			Files.copy(file.toPath(), copy.toPath());
+			Files.copy(file.toPath(), copy.toPath(),StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        try {
+		try {
 			FileOutputStream f = new FileOutputStream(file);
 			ObjectOutputStream o = new ObjectOutputStream(f);
 
-            //  object to disk
-            o.writeObject(obj);
-
+			// Write object to disk
+			o.writeObject(obj);
+			o.flush();
 			o.close();
 			f.close();
+			copy.delete();
+			return true;
 		} catch (FileNotFoundException e) {
 			System.out.println("Invalid Path");
-            return false;
+			return false;
+		}catch(ConcurrentModificationException e){
+			return false;
 		} catch (IOException e) {
 			System.out.println("Error initializing stream");
-            return false;
+			return false;
 		}
+		
+	}
 
-		copy.delete();
-
-        return true;
-    }
-
-    synchronized public static Object readFromDisk(File file){
+	  public static Object readFromDisk(File file) {
 
 		Object result = null;
 
-        try {
+		try {
 			FileInputStream fi = new FileInputStream(file);
 			ObjectInputStream oi = new ObjectInputStream(fi);
 
@@ -58,13 +60,12 @@ public class FileOps {
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found");
 		} catch (IOException e) {
-			System.out.println("Error initializing stream: "+ file.getPath()+" " + e  );
+			System.out.println("Error initializing stream: " + file.getPath() + " " + e);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 
-        return result;
-    }
-
+		return result;
+	}
 
 }

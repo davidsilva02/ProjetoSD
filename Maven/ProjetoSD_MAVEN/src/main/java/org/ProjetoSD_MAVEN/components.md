@@ -3,8 +3,8 @@
 - Tem fila de urls, utiliza-se LinkingBlockingDeque, quando o url é introduzido pelo cliente é colocado na cabeça da fila, quando o link é "descoberto" pelo Downloader é adicionado na cauda
 - Tem HashMap com registo dos usuários
 - Tem HashMap com o registo do system
-- Tem CopyOnArrayList para guardar as pesquisas feitas
-- Tem CopyOnArrayList para guardar os barrels (o barrel envia a sua interface e o SearchModule guarda-a) que se ligam, de forma a puder fazer pesquisas num barrel aleatorio.
+- Tem CopyOnWriteArrayList para guardar as pesquisas feitas
+- Tem CopyOnWriteArrayList para guardar os barrels (o barrel envia a sua interface e o SearchModule guarda-a) que se ligam, de forma a puder fazer pesquisas num barrel aleatorio.
 # Downloader
     TROCAR ENTAO PARA TCP
   - Contem um ConcurrentHashSet com a lista de urls visitados, assim, caso o URL já tenha sido visitado não se faz o CRAWL.
