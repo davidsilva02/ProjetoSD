@@ -49,6 +49,13 @@ public class RMIClient {
                             flagWorked = true;
                         } catch (RemoteException e) {
                             e.printStackTrace();
+                            System.out.println("Erro na operação. A tentar novamente dentro de 7 segundos");
+
+                            try {
+                                Thread.sleep(7000);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     }
                     break;
@@ -127,6 +134,13 @@ public class RMIClient {
                             flagWorked = true;
                         } catch (RemoteException e) {
                             e.printStackTrace();
+                            System.out.println("Erro na operação. A tentar novamente dentro de 7 segundos");
+
+                            try {
+                                Thread.sleep(7000);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     }
                     break;
@@ -150,6 +164,13 @@ public class RMIClient {
 
                         } catch (Exception e) {
                             e.printStackTrace();
+                            System.out.println("Erro na operação. A tentar novamente dentro de 7 segundos");
+
+                            try {
+                                Thread.sleep(7000);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     }
                     break;
@@ -191,6 +212,13 @@ public class RMIClient {
 
                         } catch (Exception e) {
                             e.printStackTrace();
+                            System.out.println("Erro na operação. A tentar novamente dentro de 7 segundos");
+
+                            try {
+                                Thread.sleep(7000);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                             //break;
                         }
                     }
@@ -210,6 +238,13 @@ public class RMIClient {
                             flagWorked = true;
                         } catch (RemoteException e) {
                             e.printStackTrace();
+                            System.out.println("Erro na operação. A tentar novamente dentro de 7 segundos");
+
+                            try {
+                                Thread.sleep(7000);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     }
 
@@ -238,6 +273,13 @@ public class RMIClient {
                             flagWorked = true;
                         } catch (RemoteException e) {
                             e.printStackTrace();
+                            System.out.println("Erro na operação. A tentar novamente dentro de 7 segundos");
+
+                            try {
+                                Thread.sleep(7000);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     }
 

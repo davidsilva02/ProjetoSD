@@ -29,7 +29,8 @@ public class FileOps {
 			o.flush();
 			o.close();
 			f.close();
-			copy.delete();
+			Files.copy(file.toPath(),copy.toPath(),StandardCopyOption.REPLACE_EXISTING);
+			//copy.delete();
 			return true;
 		} catch (FileNotFoundException e) {
 			System.out.println("Invalid Path");
