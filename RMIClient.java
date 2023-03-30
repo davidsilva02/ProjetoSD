@@ -189,6 +189,7 @@ public class RMIClient {
 
                         } catch (Exception e) {
                             e.printStackTrace();
+                            //break;
                         }
                     }
                     break;
