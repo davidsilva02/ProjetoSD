@@ -211,7 +211,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 }
             }
 
-            // System.out.printf("RECEBI O TAMANHO %d", tamanho_a_receber);
+            System.out.printf("RECEBI O TAMANHO %d", tamanho_a_receber);
 
             DatagramPacket recv = null;
             // enquanto nao receber a opcao correta
@@ -273,7 +273,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 // indexar info recebida por multicast pelos downloaders
                 infoURL urlAtual = null;
                 String url = obj.getUrl();
-                // System.out.println("A indexar o objeto com url " + url);
+                System.out.println("A indexar o objeto com url " + url);
                 String title = obj.getTitle();
                 String citation = obj.getCitation();
                 HashSet<String> termos = obj.getTermos();
