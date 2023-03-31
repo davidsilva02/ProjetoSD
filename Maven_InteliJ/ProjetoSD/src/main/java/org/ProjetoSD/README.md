@@ -1,4 +1,3 @@
 # ProjetoSD
 
-# Adicionar JSoup
-Arrastar jsoup.jar para Referenced Libraries (em JAVA PROJECTS)
+Correr na seguinte ordem: SearchModule, RMIClient, IndexStorageBarrel (escrever nome do ficheiro que queremos armazenar a informacao dos barrels), Downloader (definir número de threads do AnalisadorJSOUP)

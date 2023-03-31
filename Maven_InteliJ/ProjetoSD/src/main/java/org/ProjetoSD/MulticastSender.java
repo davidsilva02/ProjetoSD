@@ -19,6 +19,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.Deflater;
 
+/**
+ * Thread que retira classe JSOUPData da fila de mensagens e envia 
+ * a classe para os barrels por Multicast
+ */
 public class MulticastSender implements Runnable {
     RMI searchModule;
     MulticastSocket socket;

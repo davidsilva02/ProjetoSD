@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 
 /**
- * Classe que envia todos os dados para os barrels
+ * Classe que envia info para para os barrels, está na fila de mensagens
  */
 public class JSOUPData implements Serializable {
 

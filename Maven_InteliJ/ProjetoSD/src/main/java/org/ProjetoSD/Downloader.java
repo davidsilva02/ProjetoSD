@@ -17,6 +17,10 @@ import java.util.concurrent.ConcurrentHashMap.KeySetView;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Programa que cria as threads que fazem crawl dos urls e a thread que envia por  Multicast
+ * a informação recolhida contida na fila de mensagens
+ */
 public class Downloader extends UnicastRemoteObject implements DownloaderRMI {
 
     RMI server;
@@ -159,7 +163,6 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI {
         for (int i = 0; i < 10; i++) {
             new AnalisadorJSOUP("Downloader" + Integer.toString(i), l, visited_urls, urlQueue, lockFileJSOUP);
         }
-
     }
 
     @Override
@@ -182,5 +185,4 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI {
 
         number_barrels.set(n);
     }
-
 }

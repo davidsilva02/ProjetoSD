@@ -2,6 +2,8 @@ package org.ProjetoSD;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.ServerNotActiveException;
@@ -13,7 +15,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
-
+/**
+ * Programa que serve de ponte para todos os componentes, é aqui que todos os componentes conectam-se para 
+ * guardar o seu status, também é aqui que são guardados os termos mais pesquisados
+ */
 public class SearchModule extends UnicastRemoteObject implements RMI {
 
     private CopyOnWriteArrayList<BarrelRMI> barrels = new CopyOnWriteArrayList<>();
@@ -86,12 +91,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         } catch (RemoteException re) {
             System.out.println("Exception in RMISERVER.main: " + re);
             System.exit(1);
-        } /*
-           * catch (MalformedURLException e) {
-           * System.out.println("MalformedURLException in HelloImpl.main: " + e);
-           * }
-           */
-        //save all files shutdown
+        } 
 
     }
 

@@ -2,6 +2,9 @@ package org.ProjetoSD;
 
 import java.io.Serializable;
 
+/**
+ * Classe que armazena o ip e o estado de cada componente
+ */
 public class Component implements Serializable{
 
     private String ip;

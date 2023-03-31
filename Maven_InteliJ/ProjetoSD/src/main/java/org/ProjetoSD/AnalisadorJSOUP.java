@@ -16,6 +16,10 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Thread que retira da fila downloader e faz crawler do url e adiciona a info na fila 
+ * de mensagens Multicast
+ */
 public class AnalisadorJSOUP implements Runnable {
 
     // MulticastSocket socket;

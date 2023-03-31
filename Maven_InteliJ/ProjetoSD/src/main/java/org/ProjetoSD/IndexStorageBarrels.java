@@ -21,6 +21,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
+/**
+ * Armazenamento da info recolhida pelos crawlers, de forma ao Client puder
+ * fazer pesquisas de forma rápida e eficiente
+ */
 public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRMI {
     private String MULTICAST_ADDRESS = "224.3.2.1";
     private int PORT = 4321;
@@ -119,7 +123,6 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         // le do disco
         else {
             Boolean flagFoundOther = false;
-            System.out.println("AQUI2!!!");
 
             //primeiro averiguar já existe alguem barrel criado
             for (int i = 0; i < listFiles.length; i++) {
@@ -167,7 +170,6 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 resultados_pesquisa = new ConcurrentHashMap<>();
         } else {
             Boolean flagFoundOther = false;
-            System.out.println("AQUI3!!!");
 
             //primeiro averiguar já existe alguem barrel criado
             for (int i = 0; i < listFiles.length; i++) {

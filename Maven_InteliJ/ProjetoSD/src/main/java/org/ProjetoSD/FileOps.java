@@ -11,6 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ConcurrentModificationException;
 
+/**
+ * Gravacão de objetos em disco
+ */
 public class FileOps {
 
 	  public static Boolean writeToDisk(File file, Object obj) {

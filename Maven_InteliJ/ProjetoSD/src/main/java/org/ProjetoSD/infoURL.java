@@ -3,6 +3,10 @@ package org.ProjetoSD;
 import java.io.Serializable;
 import java.util.HashSet;
 
+/**
+ * Classe que armazena a informacao do url, a string url, a string title, a citacao, e um hashset que contem
+ * os urls que têm referencia para o url em causa
+ */
 public class infoURL implements Serializable {
     private String url;
     private String title;

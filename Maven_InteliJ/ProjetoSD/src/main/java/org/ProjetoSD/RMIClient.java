@@ -8,6 +8,9 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Programa para o client fazer pedidos ao SearchModule
+ */
 public class RMIClient {
     Scanner sc;
     RMI server;
