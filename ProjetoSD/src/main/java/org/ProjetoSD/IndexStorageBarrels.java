@@ -269,8 +269,8 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         sql= """
             CREATE TABLE IF NOT EXISTS url(
                 url VARCHAR(255) NOT NULL PRIMARY KEY,
-                titulo VARCHAR(255),
-                citacao VARCHAR(100));
+                titulo VARCHAR(80),
+                citacao VARCHAR(50));
              """;
 
         status=makeQuery(sql);
@@ -381,7 +381,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     }
 
     public void start() {
-        path_db = "jdbc:sqlite:" + new File(this.barrelName).getAbsolutePath();
+        path_db = "jdbc:sqlite:" + new File(this.barrelName + ".db").getAbsolutePath();
 
         if (!verificateAndCreateTables()) System.out.println("ERRO: CRIAÇÃO DE TABELAS");
 

@@ -18,7 +18,9 @@ import java.util.Scanner;
  * Programa para o client fazer pedidos ao SearchModule
  */
 
+/*
 @RestController
+*/
 public class RMIClient {
     Scanner sc;
     RMI server;
@@ -35,7 +37,7 @@ public class RMIClient {
         loggedUser=null;
     }
 
-   /* public static void main(String[] args) {
+    public static void main(String[] args) {
         RMIClient c = new RMIClient();
         c.start();
     }
@@ -328,9 +330,8 @@ public class RMIClient {
 
         return opt;
     }
-*/
 
-    @GetMapping("/searchTermo")
+    /*@GetMapping("/searchTermo")
     @ResponseBody
     public String  getSearch(@RequestParam String search) {
         //chamar metodo RMI para fazer pesquisa
@@ -357,5 +358,5 @@ public class RMIClient {
         }
 
         return res;
-    }
+    }*/
 }
