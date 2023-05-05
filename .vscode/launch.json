@@ -1,0 +1,42 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "RMIClient",
+            "request": "launch",
+            "mainClass": "RMIClient",
+            "projectName": "ProjetoSD_fc8739cb"
+        },
+        {
+            "type": "java",
+            "name": "IndexStorageBarrels",
+            "request": "launch",
+            "mainClass": "IndexStorageBarrels",
+            "projectName": "ProjetoSD_fc8739cb"
+        },
+        {
+            "type": "java",
+            "name": "Downloader",
+            "request": "launch",
+            "mainClass": "Downloader",
+            "projectName": "ProjetoSD_fc8739cb"
+        },
+        {
+            "type": "java",
+            "name": "SearchModule",
+            "request": "launch",
+            "mainClass": "SearchModule",
+            "projectName": "ProjetoSD_fc8739cb"
+        },
+        {
+            "type": "java",
+            "name": "SearchModule",
+            "request": "launch",
+            "mainClass": "SearchModule",
+            "projectName": "ProjetoSD"
+        },
+        {
+            "mainClass": "${file}"
+        }
+    ]
+}

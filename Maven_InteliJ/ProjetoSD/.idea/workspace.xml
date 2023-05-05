@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="77785b70-fd25-41aa-a9f9-b85887bd480f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/DW/l.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DW/urlQ.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DW/visitedUrls.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISB/index_ba.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISB/index_ba.bin.copy.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISB/index_barrel.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISB/index_barrel.bin.copy.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISB/searchResults_b.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISB/searchResults_ba.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISB/searchResults_barrel.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISB/urls_b.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISB/urls_b.bin.copy.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISB/urls_ba.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISB/urls_barrel.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SM/searches.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SM/users.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/AnalisadorJSOUP.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/AnalisadorJSOUP.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/Component.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/Component.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/Downloader.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/Downloader.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/FileOps.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/FileOps.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/IndexStorageBarrels$searchTermosHash.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/IndexStorageBarrels$searchTermosHash.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/IndexStorageBarrels.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/IndexStorageBarrels.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/JSOUPData.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/JSOUPData.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/MulticastSender.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/MulticastSender.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/RMIClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/RMIClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/SearchModule.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/SearchModule.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/Searched.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/Searched.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/ProjetoSD/infoURL.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/ProjetoSD/infoURL.class" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectId" id="2NkNrIUiaYk0HGM8Gn2BRg7GFfV" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="77785b70-fd25-41aa-a9f9-b85887bd480f" name="Changes" comment="" />
+      <created>1680204324224</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1680204324224</updated>
+      <workItem from="1680204324227" duration="2000" />
+      <workItem from="1680283228321" duration="22000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
