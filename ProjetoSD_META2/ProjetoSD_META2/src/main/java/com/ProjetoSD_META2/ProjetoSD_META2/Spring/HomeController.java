@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
+import com.ProjetoSD_META2.ProjetoSD_META2.infoURL;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 @Controller
 public class HomeController {
@@ -40,9 +42,17 @@ public class HomeController {
     }
     
     @PostMapping("/search")
-    public String searchTermo( @ModelAttribute InputText in, Model model){
+    public String searchTermo( @ModelAttribute InputSearch in, Model model){
+
+        try{
+            server.resultadoPesquisa(in.getInp(), in.getUserId());
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
         System.out.println(in.getInp());
         model.addAttribute("inptext",in);
+
         return "result";
     }
     
@@ -74,6 +84,32 @@ public class HomeController {
         model.addAttribute("inptext",new InputText());
         return "index_url";
     }
-    
+
+    @PostMapping("/getReferenceUrl")
+    public String getReferenceUrl( @ModelAttribute InputText in, Model model){
+
+
+        //ArrayList<infoURL> results = null;
+        // try {
+        //       results = server.getReferencesList(in.getInp());
+        // } catch (RemoteException e) {
+        //     e.printStackTrace();
+        // }
+
+        // System.out.println(in.getInp() + " " + result);
+        // model.addAttribute("inptext",result);
+
+        System.out.println(in.getInp());
+        model.addAttribute("inptext",in);
+
+        return "home";
+        // return "indexUrlResult";
+    }
+
+    @GetMapping("/getReferenceUrlPage")
+    public String getReferenceUrlPage(Model model){
+        model.addAttribute("inptext",new InputText());
+        return "getReferenceUrlPage";
+    }
     
 }

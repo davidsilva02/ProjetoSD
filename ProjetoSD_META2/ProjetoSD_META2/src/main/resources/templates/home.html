@@ -27,13 +27,17 @@
             <button type="submit" value="Submit">
             </button>
         </form> -->
-        <form action="#" th:action="@{/indexUrlPage}" method="get">
-            <button type="submit" value="Index URL" >Index Url
-            </button>
-        </form>
+<!--        <form action="#" th:action="@{/indexUrlPage}" method="get">-->
+<!--            <button type="submit" value="Index URL" >Index Url-->
+<!--            </button>-->
+<!--        </form>-->
 
         <button>
             <a th:onclick="|window.location.href='/indexUrlPage'|">IndexURL</a>
+        </button>
+
+        <button>
+            <a th:onclick="|window.location.href='/getReferenceUrlPage'|">URL References</a>
         </button>
 
     </div>
