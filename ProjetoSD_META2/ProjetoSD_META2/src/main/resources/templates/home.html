@@ -22,8 +22,18 @@
         </form>
     </div>
     <div>
+        <!-- <form action="#" th:action="@{/indexUrl}" th:object="${inptext}" method="post">
+            <input type="text" th:field="*{inp}" placeholder="Index URL" />
+            <button type="submit" value="Submit">
+            </button>
+        </form> -->
+        <form action="#" th:action="@{/indexUrlPage}" method="get">
+            <button type="submit" value="Index URL" >Index Url
+            </button>
+        </form>
+
         <button>
-            <a href="../static/index_url.html">IndexURL</a>
+            <a th:onclick="|window.location.href='/indexUrlPage'|">IndexURL</a>
         </button>
 
     </div>

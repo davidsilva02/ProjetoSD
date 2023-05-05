@@ -10,6 +10,7 @@ import java.net.MulticastSocket;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,165 +40,12 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     ReentrantLock lockFile1;
     Integer countIterations = 0;
 
+    private String path_db;
+
     public IndexStorageBarrels(String name) throws RemoteException {
         super();
 
         this.barrelName = name;
-
-        //Create folder
-        File folder = new File("./ISB");
-        folder.mkdir();
-
-        File[] listFiles = new File("./ISB").listFiles();
-
-        File indBin = new File(String.format("./ISB/index_%s.bin", name));
-        File copy = new File(indBin.getAbsolutePath() + ".copy.bin");
-
-        if (!copy.exists() && indBin.exists()) {
-            this.ind = (ConcurrentHashMap<String, HashSet<infoURL>>) FileOps.readFromDisk(indBin);
-
-            if (this.ind == null)
-                this.ind = new ConcurrentHashMap<String, HashSet<infoURL>>();
-        } else if (copy.exists() && indBin.exists()) {
-
-            this.ind = (ConcurrentHashMap<String, HashSet<infoURL>>) FileOps.readFromDisk(copy);
-            if (this.ind == null && indBin.exists()) {
-                    this.ind = (ConcurrentHashMap<String, HashSet<infoURL>>) FileOps.readFromDisk(indBin);
-            }
-
-            if(this.ind == null)
-                this.ind = new ConcurrentHashMap<String, HashSet<infoURL>>();
-        }
-        // le do disco
-        else {
-            Boolean flagFoundOther = false;
-
-            //primeiro averiguar já existe alguem barrel criado
-            for (int i = 0; i < listFiles.length; i++) {
-                if (listFiles[i].isFile()) {
-                    String fileName = listFiles[i].getName();
-                    if (fileName.startsWith("index_") && fileName.endsWith(".bin")) {
-                        //TENTAR RECUPERAR
-                        //System.out.println(String.format("File name: %s",fileName));
-                        this.ind = (ConcurrentHashMap<String, HashSet<infoURL>>) FileOps.readFromDisk(new File(String.format("ISB/%s",fileName)));
-
-                        if(this.ind != null){
-                            flagFoundOther = true;
-                            break;
-                        }
-
-
-                    }
-                }
-            }
-
-
-            if(!flagFoundOther) {
-                this.ind = new ConcurrentHashMap<String, HashSet<infoURL>>();
-                try {
-                    indBin.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        File urlsBin = new File(String.format("./ISB/urls_%s.bin", name));
-        copy = new File(urlsBin.getAbsolutePath() + ".copy.bin");
-
-        if (!copy.exists() && urlsBin.exists()) {
-            this.urls = (ConcurrentHashMap<String, infoURL>) FileOps.readFromDisk(urlsBin);
-
-            if (this.urls == null)
-                this.urls = new ConcurrentHashMap<String, infoURL>();
-        } else if (copy.exists() && urlsBin.exists()) {
-            this.urls = (ConcurrentHashMap<String, infoURL>) FileOps.readFromDisk(copy);
-            if (this.urls == null && urlsBin.exists()) {
-                    this.urls = (ConcurrentHashMap<String, infoURL>) FileOps.readFromDisk(urlsBin);
-            }
-
-            if(this.urls == null)
-                this.urls = new ConcurrentHashMap<String, infoURL>();
-
-        }
-        // le do disco
-        else {
-            Boolean flagFoundOther = false;
-
-            //primeiro averiguar já existe alguem barrel criado
-            for (int i = 0; i < listFiles.length; i++) {
-                if (listFiles[i].isFile()) {
-                    String fileName = listFiles[i].getName();
-                    if (fileName.startsWith("urls_") && fileName.endsWith(".bin")) {
-                        //TENTAR RECUPERAR
-                        this.urls = (ConcurrentHashMap<String, infoURL>) FileOps.readFromDisk(new File(String.format("ISB/%s",fileName)));
-
-                        if(this.urls != null){
-                            flagFoundOther = true;
-                            break;
-                        }
-
-
-                    }
-                }
-            }
-
-            if(!flagFoundOther) {
-                this.urls = new ConcurrentHashMap<String, infoURL>();
-                try {
-                    urlsBin.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        File searchResultsBin = new File(String.format("./ISB/searchResults_%s.bin", name));
-        copy = new File(searchResultsBin.getAbsolutePath() + ".copy.bin");
-
-        if (copy.exists() && searchResultsBin.exists()) {
-            resultados_pesquisa = (ConcurrentHashMap<Integer, ArrayList<infoURL>>) FileOps.readFromDisk(copy);
-            if (resultados_pesquisa == null && searchResultsBin.exists()){
-                    resultados_pesquisa = (ConcurrentHashMap<Integer, ArrayList<infoURL>>) FileOps.readFromDisk(searchResultsBin);
-            }
-
-            if(resultados_pesquisa == null)
-                resultados_pesquisa = new ConcurrentHashMap<>();
-
-        } else if (!copy.exists() && searchResultsBin.exists()) {
-            resultados_pesquisa = (ConcurrentHashMap<Integer, ArrayList<infoURL>>) FileOps.readFromDisk(searchResultsBin);
-            if (resultados_pesquisa == null)
-                resultados_pesquisa = new ConcurrentHashMap<>();
-        } else {
-            Boolean flagFoundOther = false;
-
-            //primeiro averiguar já existe alguem barrel criado
-            for (int i = 0; i < listFiles.length; i++) {
-                if (listFiles[i].isFile()) {
-                    String fileName = listFiles[i].getName();
-                    if (fileName.startsWith("searchResults_") && fileName.endsWith(".bin")) {
-                        //TENTAR RECUPERAR
-                        this.resultados_pesquisa = (ConcurrentHashMap<Integer, ArrayList<infoURL>>) FileOps.readFromDisk(new File(String.format("ISB/%s",fileName)));
-
-                        if(this.resultados_pesquisa != null){
-                            flagFoundOther = true;
-                            break;
-                        }
-
-
-                    }
-                }
-            }
-
-            if(!flagFoundOther) {
-                resultados_pesquisa = new ConcurrentHashMap<Integer, ArrayList<infoURL>>();
-                try {
-                    searchResultsBin.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
 
         try {
             this.socket = new MulticastSocket(PORT);
@@ -217,6 +65,154 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         this.lockFile1 = new ReentrantLock();
     }
 
+    public Connection makeConnection(){
+        //conectar ao sqlite
+        Connection conn = null;
+        try{
+            conn = DriverManager.getConnection(path_db);
+            if (conn != null) {
+                DatabaseMetaData meta = conn.getMetaData();
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.exit(0);
+        }
+
+        return conn;
+    }
+
+    public boolean makeQuery(String sql){
+        boolean status=false;
+
+
+        Connection c = makeConnection();
+        Statement stmt = null;
+        try {
+            stmt = c.createStatement();
+            stmt.execute(sql);
+            status=true;
+        } catch (SQLException e) {
+            status=false;
+            e.printStackTrace();
+        }
+
+        try {
+            stmt.close();
+            c.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return status;
+    }
+
+    public boolean verificateAndCreateTables(){
+        boolean status=false;
+        String sql = null;
+
+        //create table of urls
+        sql= """
+            CREATE TABLE IF NOT EXISTS url(
+                url VARCHAR(255) NOT NULL PRIMARY KEY,
+                titulo VARCHAR(80),
+                citacao VARCHAR(50));
+             """;
+
+        status=makeQuery(sql);
+
+        //create table of urls, terms
+        sql= """
+            CREATE TABLE IF NOT EXISTS indice_invertido(
+                termo VARCHAR(255) NOT NULL,
+                url_termo VARCHAR(255) NOT NULL,
+                PRIMARY KEY (termo,url_termo),
+                FOREIGN KEY (url_termo) REFERENCES url(url));
+             """;
+
+        if(status) status=makeQuery(sql);
+
+        //create table of url_referencia, terms
+        sql= """
+            CREATE TABLE IF NOT EXISTS url_referencia (
+               url VARCHAR(255) NOT NULL,
+               url_referencia VARCHAR(255) NOT NULL,
+               PRIMARY KEY (url,url_referencia),
+               FOREIGN KEY (url) REFERENCES url(url),
+               FOREIGN KEY (url_referencia) REFERENCES url(url));
+             """;
+
+        if(status) status=makeQuery(sql);
+
+        //create table of url_referencia, terms
+        sql= """
+            CREATE TABLE IF NOT EXISTS contagem_referencias (
+               url VARCHAR(255) NOT NULL,
+               count INTEGER DEFAULT 0,
+               PRIMARY KEY (url),
+               FOREIGN KEY (url) REFERENCES url(url));
+             """;
+
+        if(status) status=makeQuery(sql);
+
+        return status;
+    }
+
+    private boolean inserirURL(JSOUPData u) {
+        boolean status=false;
+        Connection c = makeConnection();
+        String sql=null;
+        PreparedStatement s;
+
+        try {
+            c.setAutoCommit(false);
+
+            //inserir url
+            sql= "INSERT OR REPLACE INTO url (url,titulo,citacao) VALUES (?,?,?);";
+            s = c.prepareStatement(sql);
+            s.setString(1,u.getUrl());
+            s.setString(2,u.getTitle());
+            s.setString(3,u.getCitation());
+            s.executeUpdate();
+
+            //inserir url nos termos
+            for (String termo:u.getTermos()){
+                sql="INSERT OR REPLACE INTO indice_invertido(termo,url_termo) VALUES (?,?);";
+                s = c.prepareStatement(sql);
+                s.setString(1,termo);
+                s.setString(2,u.getUrl());
+                s.executeUpdate();
+            }
+
+            //inserir urls que fazem referencia
+            for (String url:u.getHip()){
+                if(!u.getUrl().equals(url)){
+                    sql="INSERT OR IGNORE INTO url_referencia (url,url_referencia) VALUES (?,?);";
+                    s = c.prepareStatement(sql);
+                    s.setString(1,url);
+                    s.setString(2,u.getUrl());
+                    //adicionar na tabela contagem
+                    if(s.executeUpdate()!=0) {
+                        sql = "INSERT OR IGNORE INTO contagem_referencias (url) VALUES (?);";
+                        s=c.prepareStatement(sql);
+                        s.setString(1,url);
+                        s.executeUpdate();
+                        sql = "UPDATE contagem_referencias SET count=count+1 where url = ?;";
+                        s=c.prepareStatement(sql);
+                        s.setString(1,url);
+                        s.executeUpdate();
+                    }
+                }
+            }
+
+            c.commit();
+            s.close();
+            c.close();
+            status=true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return status;
+    }
     public static void main(String[] args) throws RemoteException {
 
         Scanner sc = new Scanner(System.in);
@@ -230,6 +226,11 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     }
 
     public void start() {
+        path_db = "jdbc:sqlite:" + new File(this.barrelName + ".db").getAbsolutePath();
+
+        if (!verificateAndCreateTables()) System.out.println("ERRO: CRIAÇÃO DE TABELAS");
+
+
         // adiciona socket multicast
         try {
             socket.joinGroup(group);
@@ -244,7 +245,6 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             e.printStackTrace();
             System.exit(1);
         }
-    
 
 
         while (true) {
@@ -349,8 +349,10 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             }
 
             if (obj != null) {
-                // indexar info recebida por multicast pelos downloaders
-                infoURL urlAtual = null;
+                if (inserirURL(obj)) System.out.println("OBJETO COM URL INDEXADO: " + obj.getUrl());
+            }
+            // indexar info recebida por multicast pelos downloaders
+                /*infoURL urlAtual = null;
                 String url = obj.getUrl();
                 System.out.println("A indexar o objeto com url " + url);
                 String title = obj.getTitle();
@@ -408,6 +410,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 countIterations++;
             }
 
+        }*/
         }
     }
 
@@ -426,8 +429,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             if (reverse.get(i) != null && reverse.get(i).contains(key))
                 reverse.get(i).remove(key);
 
-            if (reverse.get(value) == null)
-                reverse.put(value, new HashSet<infoURL>());
+            reverse.computeIfAbsent(value, k -> new HashSet<infoURL>());
             reverse.get(value).add(key);
 
             return super.put(key, value);
@@ -445,12 +447,97 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     }
 
     @Override
-    synchronized public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa, Integer id_client)
-            throws RemoteException {
+    synchronized public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa, Integer id_client) throws RemoteException {
 
         server.makeBarrelUnavailable(this.barrelName);
 
-        // procurar pelo termo
+        PreparedStatement s;
+        ResultSet r;
+        Connection c;
+        String[] termos = termo_pesquisa.toLowerCase().split(" ");
+        searchTermosHash<infoURL, Integer> urls = new searchTermosHash<>();
+        //guarda para cada url o info url já recolhido
+        HashMap<String,infoURL> aux = new HashMap<>();
+
+        for (String t : termos) {
+            try {
+                c = makeConnection();
+                c.setAutoCommit(false);
+                c.isReadOnly();
+                String sql = """
+                    select url.url,titulo,citacao, count
+                    from indice_invertido
+                    left join url on indice_invertido.url_termo=url.url
+                    left join  contagem_referencias on url.url=contagem_referencias.url
+                    where termo = ?
+                    order by count DESC;
+                        """;
+                s = c.prepareStatement(sql);
+                s.setString(1, t);
+                r = s.executeQuery();
+
+                if (r.getMetaData().getColumnCount() == 4) {
+                    while (r.next()) {
+                        //obter url
+                        String url = r.getString(1);
+                        //obter titulo
+                        String title = r.getString(2);
+                        //obter citacao
+                        String citation =r.getString(3);
+
+                        Integer count_refs=r.getInt(4);
+
+                        infoURL url_find;
+                        if(aux.containsKey(url)){
+                            url_find= aux.get(url);
+                            aux.put(url,url_find);
+                        }
+                        else {
+                            url_find=new infoURL(url,title,citation,count_refs);
+                            aux.put(url,url_find);
+                        }
+
+                        if (urls.containsKey(url_find)) {
+                            urls.put(url_find, urls.get(url_find) + 1);
+                        } else {
+                            urls.put(url_find, 1);
+                        }
+                    }
+                }
+                c.commit();
+                s.close();
+                c.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        ArrayList<infoURL> sortedTermSearch = new ArrayList<>();
+
+        for (Integer i : urls.getAllKeys()) {
+            // System.out.println(i);
+            HashSet<infoURL> termsSearch = urls.getKeys(i);
+            ArrayList<infoURL> sortedTermsSearch_ = new ArrayList<>(termsSearch);
+            // ordenar pelo numero de referencias
+            sortedTermsSearch_.sort(Comparator.comparing(infoURL::getCount_refs));
+            // System.out.println(sortedTermsSearch_);
+            sortedTermSearch.addAll(sortedTermsSearch_);
+        }
+
+        // nao existem mais paginas
+        if (sortedTermSearch.size() <= 10)
+            sortedTermSearch.add(new infoURL("fim"));
+        else {
+            resultados_pesquisa.put(id_client,
+                    new ArrayList<infoURL>(sortedTermSearch.subList(10, sortedTermSearch.size())));
+            sortedTermSearch = new ArrayList<infoURL>(sortedTermSearch.subList(0, 10));
+        }
+        server.makeBarrelAvailable(this.barrelName);
+        if (sortedTermSearch.size() > 0)
+            return sortedTermSearch;
+        return null;
+
+      /*  // procurar pelo termo
         String[] termos = termo_pesquisa.split(" ");
         searchTermosHash<infoURL, Integer> urls = new searchTermosHash<>();
 
@@ -495,18 +582,47 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 lockFile1.unlock();
                 // countIterations = 0;
             // }
-        }).start();
+        }).start();*/
 
-        server.makeBarrelAvailable(this.barrelName);
+      /*  server.makeBarrelAvailable(this.barrelName);
         if (sortedTermSearch.size() > 0)
             return sortedTermSearch;
-        return null;
+        return null;*/
     }
 
     @Override
     public ArrayList<infoURL> resultsReferencesList(String url) throws RemoteException {
-        if (urls.containsKey(url)) {
+        Connection c = makeConnection();
+        PreparedStatement s;
+        ResultSet r;
+        ArrayList<infoURL> result = new ArrayList<>();
+
+        try {
+            c.setAutoCommit(false);
+            c.isReadOnly();
+            String sql= """
+                        select url.url ,titulo,citacao
+                        from url_referencia
+                        join url on url_referencia.url_referencia  = url.url
+                        where url_referencia.url = ?;
+                       """;
+            s=c.prepareStatement(sql);
+            s.setString(1,url);
+            r=s.executeQuery();
+
+            while(r.next()){
+                result.add(new infoURL(r.getString(1),r.getString(2),r.getString(3),-1));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+      /*  if (urls.containsKey(url)) {
             return new ArrayList<>(this.urls.get(url).getUrls());
+        } else
+            return null;*/
+
+        if (result.size()!=0) {
+            return result;
         } else
             return null;
     }

@@ -1,5 +1,6 @@
 package com.ProjetoSD_META2.ProjetoSD_META2;
 
+
 import java.io.Serializable;
 import java.util.HashSet;
 
@@ -11,7 +12,11 @@ public class infoURL implements Serializable {
     private String url;
     private String title;
     private String citation;
+
+    private Integer count_refs;
+/*
     private HashSet<infoURL> urls = new HashSet<>();
+*/
 
     public String getTitle() {
         return title;
@@ -35,17 +40,24 @@ public class infoURL implements Serializable {
         this.citation = citation;
     }
 
+    public infoURL(String url, String title, String citation ,Integer count_refs) {
+        this.url = url;
+        this.title = title;
+        this.citation = citation;
+        this.count_refs=count_refs;
+    }
+
     public infoURL(String url) {
         this.url = url;
     }
 
-    public boolean addURL(infoURL url) {
+    /*public boolean addURL(infoURL url) {
         return urls.add(url);
     }
 
     public int numeroURL() {
         return this.urls.size();
-    }
+    }*/
 
     public String getUrl() {
         return url;
@@ -55,13 +67,25 @@ public class infoURL implements Serializable {
         this.url = url;
     }
 
+    public Integer getCount_refs() {
+        return count_refs;
+    }
+
+    public void setCount_refs(Integer count_refs) {
+        this.count_refs = count_refs;
+    }
+
+    /*
     public HashSet<infoURL> getUrls() {
         return urls;
     }
+*/
 
+/*
     public void setUrls(HashSet<infoURL> urls) {
         this.urls = urls;
     }
+*/
 
     @Override
     public String toString() {
