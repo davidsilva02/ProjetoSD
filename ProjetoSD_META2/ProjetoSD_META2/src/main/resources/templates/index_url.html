@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>IndexURL</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
-    <h1>Indexar URL</h1>
+    <div th:insert="~{navbar::navbar}"></div>
+    <div class="content">
+    <h1>Index URL</h1>
     <div id="search">
-        <form action="#" th:action="@{/indexNewUrl}" th:object="${inptext}" method="post">
+        <form action="#" th:action="@{/index-new-url}" th:object="${inptext}" method="post">
             <input type="text" th:field="*{inp}" placeholder="IndexUrl"/>
             <button id="submit-index-url" type="submit" value = "Submit">
             <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
@@ -17,6 +19,8 @@
                 IndexURL
             </button>
         </form>
+    </div>
+        <p th:text="${result}"/>
     </div>
 </body>
 </html>

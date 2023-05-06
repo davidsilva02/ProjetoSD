@@ -5,15 +5,12 @@ import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 */
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 import com.ProjetoSD_META2.ProjetoSD_META2.infoURL;
 
-import java.rmi.Naming;
-import java.rmi.RemoteException;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 
 @Controller
@@ -36,27 +33,39 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String home(Model model){
+    public String home(HttpSession s, Model model){
         model.addAttribute("inptext",new InputText());
+
         return "home";
     }
     
     @PostMapping("/search")
-    public String searchTermo( @ModelAttribute InputSearch in, Model model){
-
-        try{
+    public String searchTermo(@ModelAttribute InputSearch in, Model model){
+      /*  try{
             server.resultadoPesquisa(in.getInp(), in.getUserId());
         }catch (RemoteException e){
             e.printStackTrace();
-        }
+        }*/
 
+/*
         System.out.println(in.getInp());
-        model.addAttribute("inptext",in);
 
-        return "result";
+
+*/
+        model.addAttribute("search",in.getInp());
+
+        ArrayList<infoURL> urls = new ArrayList<>();
+        urls.add (new infoURL("url","title","citation"));
+        urls.add (new infoURL("url1","title1","citation1"));
+
+
+        model.addAttribute("results",urls);
+
+
+        return "result_search";
     }
     
-    @PostMapping("/indexNewUrl")
+    @PostMapping("/index-new-url")
     public String indexarUrl( @ModelAttribute InputText in, Model model){
 
 
@@ -70,22 +79,21 @@ public class HomeController {
         // }
 
         // System.out.println(in.getInp() + " " + result);
-        // model.addAttribute("inptext",result);
+        model.addAttribute("inptext",new InputText());
 
-        System.out.println(in.getInp());
-        model.addAttribute("inptext",in);
-        
-        return "home";
-        // return "indexUrlResult";
+        //se o url for indexado
+        model.addAttribute("result","URL " + in.getInp() + " indexed!");
+
+        return "index_url";
     }
 
-    @GetMapping("/indexUrlPage")
+    @GetMapping("/index-url")
     public String indexUrlPage(Model model){
         model.addAttribute("inptext",new InputText());
         return "index_url";
     }
 
-    @PostMapping("/getReferenceUrl")
+    @PostMapping("/search-reference-urls")
     public String getReferenceUrl( @ModelAttribute InputText in, Model model){
 
 
@@ -99,17 +107,27 @@ public class HomeController {
         // System.out.println(in.getInp() + " " + result);
         // model.addAttribute("inptext",result);
 
-        System.out.println(in.getInp());
-        model.addAttribute("inptext",in);
+        model.addAttribute("search", in.getInp());
 
-        return "home";
-        // return "indexUrlResult";
+        ArrayList<infoURL> urls = new ArrayList<>();
+        urls.add (new infoURL("url","title","citation"));
+        urls.add (new infoURL("url1","title1","citation1"));
+
+
+        model.addAttribute("results",urls);
+
+        return "result_references";
     }
 
-    @GetMapping("/getReferenceUrlPage")
+    @GetMapping("/reference-url")
     public String getReferenceUrlPage(Model model){
         model.addAttribute("inptext",new InputText());
-        return "getReferenceUrlPage";
+        return "reference_urls";
+    }
+
+    @GetMapping("/stats-of-system")
+    public String getStats(Model model){
+        return "admin_page";
     }
     
 }

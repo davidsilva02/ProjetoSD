@@ -6,11 +6,8 @@
     <link th:href="@{/style.css}" rel="stylesheet" />
 </head>
 <body>
+<div th:insert="~{navbar::navbar}"></div>
 <div class="content">
-    <button>
-        <a href="../static/admin_page.html">Stats of System</a>
-    </button>
-    <h1>Googol</h1>
     <div id="search-input">
         <form action="#" th:action="@{/search}" th:object="${inptext}" method="post">
             <input type="text" th:field="*{inp}" placeholder="Search term" />
@@ -22,22 +19,13 @@
         </form>
     </div>
     <div>
-        <!-- <form action="#" th:action="@{/indexUrl}" th:object="${inptext}" method="post">
-            <input type="text" th:field="*{inp}" placeholder="Index URL" />
-            <button type="submit" value="Submit">
-            </button>
-        </form> -->
-<!--        <form action="#" th:action="@{/indexUrlPage}" method="get">-->
-<!--            <button type="submit" value="Index URL" >Index Url-->
-<!--            </button>-->
-<!--        </form>-->
-
+        <br>
         <button>
-            <a th:onclick="|window.location.href='/indexUrlPage'|">IndexURL</a>
+            <a href="/index-url">IndexURL</a>
         </button>
 
         <button>
-            <a th:onclick="|window.location.href='/getReferenceUrlPage'|">URL References</a>
+            <a href="/reference-url">URL References</a>
         </button>
 
     </div>

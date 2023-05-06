@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NavBar</title>
+  <link rel="stylesheet" th:href="@{style.css}">
+</head>
+<body>
+  <div th:fragment="navbar" class="navbar">
+    <button>
+      <a href="/stats-of-system">Stats of System</a>
+    </button>
+      <button>
+          <a href="/index-url">Index URL</a>
+      </button>
+      <button>
+          <a href="/reference-url">Reference URL</a>
+      </button>
+    <a href="/"><h1>Googol</h1></a>
+  </div>
+</body>
+</html>

@@ -6,13 +6,12 @@
     <link th:href="@{/style.css}" rel="stylesheet" />
 </head>
 <body>
+
+    <div th:insert="~{navbar::navbar}"></div>
 <div class="content">
-    <button>
-        <a href="../static/admin_page.html">Stats of System</a>
-    </button>
-    <h1>Googol</h1>
+    <h1>URL References</h1>
     <div id="search-input">
-        <form action="#" th:action="@{/getReferenceUrl}" th:object="${inptext}" method="post">
+        <form action="#" th:action="@{/search-reference-urls}" th:object="${inptext}" method="post">
             <input type="text" th:field="*{inp}" placeholder="URL to get references" />
             <button type="submit" value="Submit">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">

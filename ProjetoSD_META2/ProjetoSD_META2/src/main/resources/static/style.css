@@ -6,15 +6,50 @@ body{
     font-family: "Montserrat", serif ;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 
 a{
     text-decoration: none;
     color: black;
-
 }
 
+button{
+    background: none;
+    border: 2px solid black;
+    border-radius: 25px;
+    height: 35px;
+}
+button:hover{
+    background: lightgrey;
+    border: 2px solid black;
+    border-radius: 25px;
+    height: 35px;
+}
+
+.navbar{
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar h1{
+    font-size: 50px;
+}
 .content{
     justify-content: center;
+    align-items: center;
+}
+
+.content h1{
+    font-size: medium;
+}
+
+.result-search-item{
+    width: 500px;
+    height: auto;
+    border: 2px solid black;
+    border-radius: 25px;
+    margin-bottom: 20px;
+    display: block;
     align-items: center;
 }
