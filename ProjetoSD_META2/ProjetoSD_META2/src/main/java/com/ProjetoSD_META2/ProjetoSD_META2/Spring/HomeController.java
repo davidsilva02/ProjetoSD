@@ -3,6 +3,8 @@ package com.ProjetoSD_META2.ProjetoSD_META2.Spring;
 /*
 import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 */
+import com.ProjetoSD_META2.ProjetoSD_META2.Component;
+import com.ProjetoSD_META2.ProjetoSD_META2.Searched;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +13,10 @@ import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 import com.ProjetoSD_META2.ProjetoSD_META2.infoURL;
 
 import javax.servlet.http.HttpSession;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import java.rmi.*;
 import java.util.Objects;
@@ -31,6 +36,10 @@ public class HomeController {
              e.printStackTrace();
              System.exit(0);
          }
+<<<<<<< HEAD
+
+=======
+>>>>>>> 6ea004b781ec9f4fa7e7971b43b4be982faacdfb
 
     }
 
@@ -40,7 +49,7 @@ public class HomeController {
 
         return "home";
     }
-    
+
     @PostMapping("/search")
     public String searchTermo(@ModelAttribute InputSearch in, Model model){
 
@@ -61,7 +70,7 @@ public class HomeController {
 
         return "result_search";
     }
-    
+
     @PostMapping("/index-new-url")
     public String indexarUrl( @ModelAttribute InputText in, Model model){
 
@@ -120,7 +129,26 @@ public class HomeController {
 
     @GetMapping("/stats-of-system")
     public String getStats(Model model){
+       //get stats
+
+        HashMap<String, Component> stats=null;
+
+        try {
+            stats=server.getComponents();
+           model.addAttribute("stats",stats);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+
+        ArrayList<Searched> searches=null;
+        try {
+            searches=server.getTopSearchs();
+            model.addAttribute("searches",searches);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+
         return "admin_page";
     }
-    
+
 }

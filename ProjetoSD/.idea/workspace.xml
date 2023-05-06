@@ -11,40 +11,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8029bfb4-b717-4693-9004-9509d2004023" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/DW/l.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/DW/l.bin.copy.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/DW/urlQ.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/DW/urlQ.bin.copy.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/DW/visitedURLS.bin.copy.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/DW/visitedUrls.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/index_B.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/index_B.bin.copy.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/index_BA.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/index_BA.bin.copy.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/searchResults_B.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/searchResults_B.bin.copy.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/searchResults_BA.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/searchResults_BA.bin.copy.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/urls_B.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/urls_B.bin.copy.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/urls_BA.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/ISB/urls_BA.bin.copy.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/SM/searches.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/SM/searches.bin.copy.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/SM/users.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/BarrelRMI.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/BarrelRMI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Downloader.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Downloader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/DownloaderRMI.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/DownloaderRMI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/IndexStorageBarrels.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/IndexStorageBarrels.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/RMIClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/RMIClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/SearchModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/SearchModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Spring/HomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Spring/HomeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/resources/static/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/resources/static/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/resources/templates/admin_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/resources/templates/admin_page.html" afterDir="false" />
-    </list>
+    <list default="true" id="8029bfb4-b717-4693-9004-9509d2004023" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
