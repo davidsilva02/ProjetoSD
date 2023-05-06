@@ -59,6 +59,12 @@
 			<artifactId>lombok</artifactId>
 			<version>1.18.26</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.41.2.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

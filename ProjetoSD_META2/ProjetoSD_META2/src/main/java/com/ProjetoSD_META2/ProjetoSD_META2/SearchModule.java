@@ -352,6 +352,8 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
         Boolean flagWorked = false;
 
+        System.out.println("A indexar o url: "+ newUrl);
+
         while (!flagWorked) {
             try {
                 dwRMI.putUrlInQueue(newUrl);
