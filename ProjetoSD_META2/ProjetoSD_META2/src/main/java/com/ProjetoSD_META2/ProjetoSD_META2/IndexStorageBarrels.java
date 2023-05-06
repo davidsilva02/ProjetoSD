@@ -61,6 +61,8 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             System.exit(0);
         }
 
+        resultados_pesquisa = new ConcurrentHashMap<>();
+
         this.lockFile = new ReentrantLock();
         this.lockFile1 = new ReentrantLock();
 
@@ -535,6 +537,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
         if (sortedTermSearch.size() <= 10)
             sortedTermSearch.add(new infoURL("fim"));
         else {
+
             resultados_pesquisa.put(id_client,
                     new ArrayList<infoURL>(sortedTermSearch.subList(10, sortedTermSearch.size())));
             sortedTermSearch = new ArrayList<infoURL>(sortedTermSearch.subList(0, 10));

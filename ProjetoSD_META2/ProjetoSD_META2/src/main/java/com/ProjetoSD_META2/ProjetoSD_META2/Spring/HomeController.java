@@ -3,8 +3,6 @@ package com.ProjetoSD_META2.ProjetoSD_META2.Spring;
 /*
 import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 */
-import com.ProjetoSD_META2.ProjetoSD_META2.Component;
-import com.ProjetoSD_META2.ProjetoSD_META2.Searched;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +11,10 @@ import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 import com.ProjetoSD_META2.ProjetoSD_META2.infoURL;
 
 import javax.servlet.http.HttpSession;
-import java.rmi.Naming;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashMap;
+
+import java.rmi.*;
+import java.util.Objects;
 
 @Controller
 public class HomeController {
@@ -34,7 +32,6 @@ public class HomeController {
              System.exit(0);
          }
 
-
     }
 
     @GetMapping("/")
@@ -46,26 +43,21 @@ public class HomeController {
     
     @PostMapping("/search")
     public String searchTermo(@ModelAttribute InputSearch in, Model model){
-      /*  try{
-            server.resultadoPesquisa(in.getInp(), in.getUserId());
+
+        ArrayList<infoURL> urls = null;
+        try{
+            urls = server.resultadoPesquisa(in.getInp(), 1);
         }catch (RemoteException e){
             e.printStackTrace();
-        }*/
+        }
 
-/*
-        System.out.println(in.getInp());
-
-
-*/
         model.addAttribute("search",in.getInp());
 
-        ArrayList<infoURL> urls = new ArrayList<>();
-        urls.add (new infoURL("url","title","citation"));
-        urls.add (new infoURL("url1","title1","citation1"));
+//        ArrayList<infoURL> urls = new ArrayList<>();
+//        urls.add (new infoURL("url","title","citation"));
+//        urls.add (new infoURL("url1","title1","citation1"));
 
-
-        model.addAttribute("results",urls);
-
+        model.addAttribute("results", Objects.requireNonNullElse(urls, new infoURL("No results found!","","")));
 
         return "result_search";
     }
@@ -74,14 +66,14 @@ public class HomeController {
     public String indexarUrl( @ModelAttribute InputText in, Model model){
 
 
-        // String result;
-        // try {
-        //     server.putURLClient(in.getInp());
-        //     result = "URL indexada com sucesso";
-        // } catch (RemoteException e) {
-        //     e.printStackTrace();
-        //     result = "Erro ao indexar URL";
-        // }
+         String result;
+         try {
+             server.putURLClient(in.getInp());
+             result = "URL indexada com sucesso";
+         } catch (RemoteException e) {
+             e.printStackTrace();
+             result = "Erro ao indexar URL";
+         }
 
         // System.out.println(in.getInp() + " " + result);
         model.addAttribute("inptext",new InputText());
@@ -101,25 +93,21 @@ public class HomeController {
     @PostMapping("/search-reference-urls")
     public String getReferenceUrl( @ModelAttribute InputText in, Model model){
 
+        System.out.println("GET REFERENCES: "+in.getInp());
 
-        //ArrayList<infoURL> results = null;
-        // try {
-        //       results = server.getReferencesList(in.getInp());
-        // } catch (RemoteException e) {
-        //     e.printStackTrace();
-        // }
+        ArrayList<infoURL> urls = null;
+         try {
+             urls = server.getReferencesList(in.getInp());
+         } catch (RemoteException e) {
+             e.printStackTrace();
+         }
 
-        // System.out.println(in.getInp() + " " + result);
-        // model.addAttribute("inptext",result);
+//        ArrayList<infoURL> urls = new ArrayList<>();
+//        urls.add (new infoURL("url","title","citation"));
+//        urls.add (new infoURL("url1","title1","citation1"));
 
         model.addAttribute("search", in.getInp());
-
-        ArrayList<infoURL> urls = new ArrayList<>();
-        urls.add (new infoURL("url","title","citation"));
-        urls.add (new infoURL("url1","title1","citation1"));
-
-
-        model.addAttribute("results",urls);
+        model.addAttribute("results", Objects.requireNonNullElse(urls, new infoURL("No results found!","","")));
 
         return "result_references";
     }
@@ -132,25 +120,6 @@ public class HomeController {
 
     @GetMapping("/stats-of-system")
     public String getStats(Model model){
-       //get stats
-
-        HashMap<String, Component> stats=null;
-
-        try {
-            stats=server.getComponents();
-           model.addAttribute("stats",stats);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-
-        ArrayList<Searched> searches=null;
-        try {
-            searches=server.getTopSearchs();
-            model.addAttribute("searches",searches);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-
         return "admin_page";
     }
     
