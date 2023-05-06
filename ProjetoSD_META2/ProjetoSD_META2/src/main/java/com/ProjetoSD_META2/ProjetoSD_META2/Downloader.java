@@ -185,4 +185,9 @@ public class Downloader extends UnicastRemoteObject implements DownloaderRMI {
 
         number_barrels.set(n);
     }
+
+    @Override
+    public String verify() throws RemoteException {
+        return "Downloader";
+    }
 }

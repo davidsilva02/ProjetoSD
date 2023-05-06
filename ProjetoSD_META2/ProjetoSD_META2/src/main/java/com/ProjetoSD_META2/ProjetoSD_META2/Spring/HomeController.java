@@ -3,6 +3,8 @@ package com.ProjetoSD_META2.ProjetoSD_META2.Spring;
 /*
 import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 */
+import com.ProjetoSD_META2.ProjetoSD_META2.Component;
+import com.ProjetoSD_META2.ProjetoSD_META2.Searched;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +13,10 @@ import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 import com.ProjetoSD_META2.ProjetoSD_META2.infoURL;
 
 import javax.servlet.http.HttpSession;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @Controller
 public class HomeController {
@@ -21,13 +26,13 @@ public class HomeController {
 
     public HomeController() {
 
-        // System.out.println("A iniciar a conexao RMI ao Search Module");
-        // try {
-        //     this.server = (RMI) Naming.lookup("rmi://localhost:3366/server");
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        //     System.exit(0);
-        // }
+         System.out.println("A iniciar a conexao RMI ao Search Module");
+         try {
+             this.server = (RMI) Naming.lookup("rmi://localhost:3366/server");
+         } catch (Exception e) {
+             e.printStackTrace();
+             System.exit(0);
+         }
 
 
     }
@@ -127,6 +132,25 @@ public class HomeController {
 
     @GetMapping("/stats-of-system")
     public String getStats(Model model){
+       //get stats
+
+        HashMap<String, Component> stats=null;
+
+        try {
+            stats=server.getComponents();
+           model.addAttribute("stats",stats);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+
+        ArrayList<Searched> searches=null;
+        try {
+            searches=server.getTopSearchs();
+            model.addAttribute("searches",searches);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+
         return "admin_page";
     }
     

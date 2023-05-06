@@ -44,6 +44,22 @@ button:hover{
     font-size: medium;
 }
 
+table{
+    border-collapse: collapse;
+    width: 100%;
+    margin-left: 40px;
+}
+
+table td, table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+table tr:nth-child(even){background-color: #f2f2f2;}
+
+table tr:hover {background-color: #ddd;}
+
+
 .result-search-item{
     width: 500px;
     height: auto;
@@ -52,4 +68,15 @@ button:hover{
     margin-bottom: 20px;
     display: block;
     align-items: center;
+}
+
+.stats{
+    display: flex;
+    flex-direction: row;
+    align-items: normal;
+}
+
+.stats caption{
+    font-weight: bold;
+    margin-bottom: 2%;
 }

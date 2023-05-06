@@ -200,19 +200,12 @@ public class RMIClient {
                             for (String key : components.keySet()) {
                                 currentComp = components.get(key);
 
-                                if (Character.isDigit(key.charAt(1))) {
-                                    // BARREL
-                                    System.out.println(String.format("Type: Barrel | Hash: %s | IP: %s | Available: %b",
-                                            key, currentComp.getIp(), currentComp.getIsAvailable()));
-
-                                } else {
-                                    // DOWNLOADER
-                                    System.out.println(
-                                            String.format("Type: Downloader | Name: %s | IP: %s | Available: %b", key,
+                                System.out.println(
+                                            String.format("Name: %s | IP: %s | Available: %b", key,
                                                     currentComp.getIp(), currentComp.getIsAvailable()));
 
                                 }
-                            }
+
 
                             System.out.println(" -- Top Searches -- ");
                             for (Searched searchObj : topSearchs)

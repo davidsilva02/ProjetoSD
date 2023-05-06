@@ -63,6 +63,8 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
         this.lockFile = new ReentrantLock();
         this.lockFile1 = new ReentrantLock();
+
+        this.resultados_pesquisa=new ConcurrentHashMap<>();
     }
 
     public Connection makeConnection(){
@@ -290,7 +292,9 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
                 }
             }
 
+/*
             System.out.printf("RECEBI O TAMANHO %d", tamanho_a_receber);
+*/
 
             DatagramPacket recv = null;
             // enquanto nao receber a opcao correta
@@ -349,7 +353,10 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
             }
 
             if (obj != null) {
+                inserirURL(obj);
+/*
                 if (inserirURL(obj)) System.out.println("OBJETO COM URL INDEXADO: " + obj.getUrl());
+*/
             }
             // indexar info recebida por multicast pelos downloaders
                 /*infoURL urlAtual = null;
@@ -645,5 +652,10 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
 
         else
             return null;
+    }
+
+    @Override
+    public String verify() throws RemoteException {
+        return barrelName;
     }
 }

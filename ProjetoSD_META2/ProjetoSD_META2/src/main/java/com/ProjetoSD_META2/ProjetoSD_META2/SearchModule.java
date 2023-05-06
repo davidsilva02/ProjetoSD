@@ -26,6 +26,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     private HashMap<String, Component> system = new HashMap<>();
     private static CopyOnWriteArrayList<Searched> searches;
     DownloaderRMI dwRMI;
+
     ReentrantLock lockFile1;
     ReentrantLock lockFile2;
 
@@ -96,6 +97,13 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
     @Override
     public void connectDwRMItoServer(DownloaderRMI ref) throws RemoteException {
+        //marcar como false os outros downloaders
+        for (String s:system.keySet()){
+            if(s.contains("Downloader")){
+                system.remove(s);
+            }
+        }
+
         // Get reference for the Downloader RMI
         this.dwRMI = ref;
     }

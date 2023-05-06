@@ -6,4 +6,6 @@ import java.rmi.RemoteException;
 public interface DownloaderRMI extends Remote {
     public void putUrlInQueue(String url) throws RemoteException;
     public void updateNumberBarrels(Integer n) throws RemoteException;
+
+    public String verify() throws RemoteException;
 }
