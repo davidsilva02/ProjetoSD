@@ -31,6 +31,7 @@ public class WebSocketClient {
             StompSession stompSession = null;
             stompSession = stompClient.connect("ws://localhost:8080/stats-websocket", sessionHandler).get();
             stompSession.send("/app/update-stats",new StatsMessage(components,searches));
+            stompSession.disconnect();
             return true;
         } catch (InterruptedException | ExecutionException e) {
             return false;

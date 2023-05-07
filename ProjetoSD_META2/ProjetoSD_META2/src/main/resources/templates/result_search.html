@@ -11,7 +11,7 @@
 <div th:insert="~{navbar::navbar}"></div>
 
     <button>
-        <a href="/index-hackernews-stories"> Index HackerNews</a>
+        <a th:href="@{'/index-hackernews-stories?termos='+${search}}"> Index HackerNews</a>
     </button>
 
     <form action="#" th:action="@{/index-hackernews-stories}" th:object="${inptext}" method="post">

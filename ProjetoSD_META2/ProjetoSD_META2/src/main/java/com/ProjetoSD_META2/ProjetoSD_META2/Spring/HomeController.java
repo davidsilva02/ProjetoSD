@@ -257,15 +257,14 @@ public class HomeController {
         s.removeAttribute("token");
         return "redirect:/";
     }
-
     @GetMapping("/index-hackernews-stories")
-    public String indexHackerNewsStories(InputText in, Model model) throws Exception {
+    public String indexHackerNewsStories(@RequestParam("termos") String termosPesquisa, Model model) throws Exception {
 
         System.out.println("HACKER NEWS");
 
         //TODO ISTO TEM DE SER REVISTO DE ACORDO COMO AS COISAS VÊM PELO THYMELEAF E ASSIM, ESTÁ APENAS POR REPRESENTATIVIDADE
-        //String termosPesquisa = in.getInp();
-        String termosPesquisa = "uc";
+/**/
+        System.out.println(termosPesquisa);
 
         String strTopStoriesId = null;
         try {
