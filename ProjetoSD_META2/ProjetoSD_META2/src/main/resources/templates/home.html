@@ -7,6 +7,9 @@
 </head>
 <body>
 <div th:insert="~{navbar::navbar}"></div>
+<div th:if="${result!=null}">
+    <h1 th:text="${result}"/>
+</div>
 <div class="content">
     <div id="search-input">
         <form action="#" th:action="@{/search}" th:object="${inptext}" method="post">
@@ -20,13 +23,13 @@
     </div>
     <div>
         <br>
-        <button>
-            <a href="/index-url">IndexURL</a>
-        </button>
+        <a href="/index-url">
+            <button>IndexURL</button>
+        </a>
 
-        <button>
-            <a href="/reference-url">URL References</a>
-        </button>
+        <a href="/reference-url">
+            <button>URL References</button>
+        </a>
 
     </div>
     </div>

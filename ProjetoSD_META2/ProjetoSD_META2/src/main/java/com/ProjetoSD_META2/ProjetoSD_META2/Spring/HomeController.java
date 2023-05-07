@@ -16,6 +16,7 @@ import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 import com.ProjetoSD_META2.ProjetoSD_META2.infoURL;
 
 import javax.servlet.http.HttpSession;
+import javax.websocket.Session;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -45,13 +46,12 @@ public class HomeController {
     @GetMapping("/")
     public String home(HttpSession s, Model model){
         model.addAttribute("inptext",new InputText());
-
         return "home";
     }
 
     @PostMapping("/search")
-    public String searchTermo(@ModelAttribute InputSearch in, Model model){
-
+    public String searchTermo(@ModelAttribute InputSearch in, Model model, HttpSession s){
+        if(in.getInp().equals("")) return "redirect:/";
         ArrayList<infoURL> urls = null;
         try{
             urls = server.resultadoPesquisa(in.getInp(), 1);
@@ -127,8 +127,9 @@ public class HomeController {
     }
 
     @GetMapping("/stats-of-system")
-    public String getStats(Model model){
+    public String getStats(Model model,HttpSession s){
        //get stats
+        if(s.getAttribute("token")==null) return "redirect:/login";
 
         HashMap<String, Component> stats=null;
 
@@ -155,5 +156,54 @@ public class HomeController {
     public StatsMessage onUpdate(StatsMessage m){
         System.out.println(m);
         return  m;
+    }
+
+    @GetMapping("/login")
+    public String login(Model model){
+        model.addAttribute("loginInput",new LoginInput());
+        return "login";
+    }
+
+    @GetMapping("/register")
+    public String register (Model model){
+        model.addAttribute("loginInput",new LoginInput());
+        return "register";
+    }
+
+    @PostMapping("/make-login")
+    public String makeLogin(@ModelAttribute LoginInput login, HttpSession s,Model model){
+        System.out.println(login);
+        String user=null;
+        try {
+            user=server.makeLogin(login.getUser(),login.getPassword());
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+
+        if(user==null) model.addAttribute("result","USER AND PASSWORD NOT FOUND!");
+        if(user!=null) model.addAttribute("result",String.format("WELCOME, @%s",user));
+        s.setAttribute("token",user);
+        return "result";
+    }
+    @PostMapping("/make-register")
+    public String makeRegister(@ModelAttribute LoginInput login, HttpSession s){
+        System.out.println(login);
+
+        //register user and password
+        try {
+            server.makeRegister(login.getUser(),login.getPassword());
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        return "redirect:/login";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession s){
+        //remove token
+        s.removeAttribute("token");
+        return "redirect:/";
     }
 }

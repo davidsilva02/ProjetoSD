@@ -35,6 +35,11 @@ button:hover{
 .navbar h1{
     font-size: 50px;
 }
+
+.navbar button{
+    width: 150px;
+}
+
 .content{
     justify-content: center;
     align-items: center;
@@ -80,3 +85,4 @@ table tr:hover {background-color: #ddd;}
     font-weight: bold;
     margin-bottom: 2%;
 }
+

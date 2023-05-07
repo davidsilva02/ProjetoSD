@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${result}"></title>
+    <link th:href="@{/style.css}" rel="stylesheet" />
+</head>
+<body>
+  <div th:insert="~{navbar::navbar}"></div>
+  <div class="content">
+    <h1 th:text="${result}"></h1>
+  </div>
+</body>
+</html>

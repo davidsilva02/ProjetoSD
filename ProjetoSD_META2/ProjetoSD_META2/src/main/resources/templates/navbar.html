@@ -7,15 +7,24 @@
 </head>
 <body>
   <div th:fragment="navbar" class="navbar">
-    <button>
-      <a href="/stats-of-system">Stats of System</a>
-    </button>
-      <button>
-          <a href="/index-url">Index URL</a>
-      </button>
-      <button>
-          <a href="/reference-url">Reference URL</a>
-      </button>
+    <a href="/stats-of-system">
+      <button>Stats of System</button>
+    </a>
+      <a href="/">
+          <button>Search Term</button>
+      </a>
+      <a href="/index-url">
+         <button>Index URL</button>
+      </a>
+      <a href="/reference-url">
+          <button>Reference URL</button>
+      </a>
+      <a th:if="${#httpSession.getAttribute('token')==null}" href="/login">
+          <button>Login</button>
+      </a>
+      <a th:if="${#httpSession.getAttribute('token')!=null}" href="/logout" >
+          <button>Logout</button>
+      </a>
     <a href="/"><h1>Googol</h1></a>
   </div>
 </body>

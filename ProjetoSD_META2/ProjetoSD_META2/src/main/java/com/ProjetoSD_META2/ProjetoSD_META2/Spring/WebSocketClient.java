@@ -58,7 +58,6 @@ public class WebSocketClient {
     }
 
     public WebSocketClient(){
-
     }
 
 
