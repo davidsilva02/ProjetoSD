@@ -303,7 +303,7 @@ public class HomeController {
                 //DEBUG
                 System.out.println("Indexing story url: " + url);
 
-                server.putURLClient(url);
+                server.putURLClient((String)story.get("url"));
 
                 indexed = true;
             }
