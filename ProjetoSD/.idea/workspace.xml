@@ -11,21 +11,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8029bfb4-b717-4693-9004-9509d2004023" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Spring/StatsMessage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Spring/WebSocketClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Spring/WebSocketConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/resources/static/admin_page.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/AppSpring.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Spring/AppSpring.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Component.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Component.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/IndexStorageBarrels.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/IndexStorageBarrels.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/SearchModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/SearchModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Searched.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Searched.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Spring/HomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/java/com/ProjetoSD_META2/ProjetoSD_META2/Spring/HomeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/resources/templates/admin_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/../ProjetoSD_META2/ProjetoSD_META2/src/main/resources/templates/admin_page.html" afterDir="false" />
-    </list>
+    <list default="true" id="8029bfb4-b717-4693-9004-9509d2004023" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -160,7 +146,7 @@
       <workItem from="1682680527618" duration="15000" />
       <workItem from="1683389792970" duration="1204000" />
       <workItem from="1683451693695" duration="440000" />
-      <workItem from="1683452155348" duration="1195000" />
+      <workItem from="1683452155348" duration="1274000" />
     </task>
     <servers />
   </component>
