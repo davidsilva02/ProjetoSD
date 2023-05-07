@@ -65,10 +65,10 @@
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.41.2.1</version>
 		</dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.webjars/webjars-locator-core -->
 		<dependency>
@@ -97,7 +97,14 @@
 			<artifactId>bootstrap</artifactId>
 			<version>5.2.3</version>
 		</dependency>
-    </dependencies>
+
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20230227</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>

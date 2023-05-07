@@ -25,6 +25,19 @@
       <a th:if="${#httpSession.getAttribute('token')!=null}" href="/logout" >
           <button>Logout</button>
       </a>
+    <button>
+      <a href="/stats-of-system">Stats of System</a>
+    </button>
+      <button>
+          <a href="/index-url">Index URL</a>
+      </button>
+      <button>
+          <a href="/reference-url">Reference URL</a>
+      </button>
+
+      <button>
+          <a href="/index-hackernews-username-page">Index stories from user</a>
+      </button>
     <a href="/"><h1>Googol</h1></a>
   </div>
 </body>

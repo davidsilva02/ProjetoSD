@@ -3,6 +3,11 @@ package com.ProjetoSD_META2.ProjetoSD_META2.Spring;
 /*
 import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 */
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import com.ProjetoSD_META2.ProjetoSD_META2.Component;
 import com.ProjetoSD_META2.ProjetoSD_META2.Searched;
 import org.springframework.messaging.Message;
@@ -20,10 +25,54 @@ import javax.websocket.Session;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 
 import java.rmi.*;
 import java.util.Objects;
+
+import java.io.*;
+import java.net.*;
+
+class Request{
+
+    public static String getRequestStr(String urlToRead) throws Exception {
+        StringBuilder result = new StringBuilder();
+        URL url = new URL(urlToRead);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(conn.getInputStream()))) {
+
+                for (String line; (line = reader.readLine()) != null; ) {
+                    result.append(line);
+                }
+        }
+        return result.toString();
+
+    }
+
+    public static JSONObject getRequestJson(String urlToRead) throws Exception {
+        StringBuilder result = new StringBuilder();
+        URL url = new URL(urlToRead);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(conn.getInputStream()))) {
+
+            JSONTokener tokener = new JSONTokener(reader);
+
+            if( tokener.nextValue().equals("null") )
+                return new JSONObject(tokener);
+            else
+                return null;
+        }
+
+    }
+
+}
 
 @Controller
 public class HomeController {
@@ -113,6 +162,8 @@ public class HomeController {
 //        ArrayList<infoURL> urls = new ArrayList<>();
 //        urls.add (new infoURL("url","title","citation"));
 //        urls.add (new infoURL("url1","title1","citation1"));
+
+
 
         model.addAttribute("search", in.getInp());
         model.addAttribute("results", Objects.requireNonNullElse(urls, new infoURL("No results found!","","")));
@@ -206,4 +257,120 @@ public class HomeController {
         s.removeAttribute("token");
         return "redirect:/";
     }
+
+    @GetMapping("/index-hackernews-stories")
+    public String indexHackerNewsStories(InputText in, Model model) throws Exception {
+
+        System.out.println("HACKER NEWS");
+
+        //TODO ISTO TEM DE SER REVISTO DE ACORDO COMO AS COISAS VÊM PELO THYMELEAF E ASSIM, ESTÁ APENAS POR REPRESENTATIVIDADE
+        //String termosPesquisa = in.getInp();
+        String termosPesquisa = "uc";
+
+        String strTopStoriesId = null;
+        try {
+            strTopStoriesId = Request.getRequestStr("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        List<Integer> arrayTopStories = null;
+        try {
+            arrayTopStories = new ObjectMapper().reader(List.class).readValue(strTopStoriesId);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        //DEBUG
+        System.out.println("Looping through stories...");
+        Boolean indexed = false;
+
+        for(Integer storyId: arrayTopStories){
+            //ir buscar a top story, verificar o texto e, se sim, indexar
+
+            String url = "https://hacker-news.firebaseio.com/v0/item/" + storyId + ".json?print=pretty";
+            JSONObject story = Request.getRequestJson(url);
+
+            System.out.println(story.toString());
+
+            //String texto = (String) story.get("text");
+            //TODO COMO É QUE SE VAI BUSCAR O TEXTO???
+            String texto = (String) story.get("title");
+
+
+            if(texto.contains(termosPesquisa)){
+
+                //DEBUG
+                System.out.println("Indexing story url: " + url);
+
+                server.putURLClient(url);
+
+                indexed = true;
+            }
+        }
+
+        //flag para ver se foi indexada alguma coisa
+        if(indexed)
+            model.addAttribute("result_index", "Success!");
+        else
+            model.addAttribute("result_index", "Terms not found in HackerNews Top Stories!");
+
+        return "index_hackernews";
+    }
+
+@GetMapping("/index-hackernews-username-page")
+    public String indexHackerRankUsernamePage(Model model){
+        model.addAttribute("inptext",new InputText());
+        return "index_hackernews_username_page";
+    }
+
+    @PostMapping("/index-hackernews-username")
+    public String indexHackerNewsUsername(InputText in, Model model){
+
+        String username = in.getInp();
+        String url = "https://hacker-news.firebaseio.com/v0/user/" + username + ".json?print=pretty";
+
+        //DEBUG
+        System.out.println("Indexing " + username + "'s stories...");
+
+        try {
+            JSONObject userdata = Request.getRequestJson(url);
+
+            if( userdata == null){
+                model.addAttribute("result_index", "Username not found!");
+
+                return "index_hackernews";
+            }
+
+            JSONArray arr = (JSONArray) userdata.get("submitted");
+
+//            System.out.println("teste: ");
+//            for(Object obj: arr)
+//                System.out.println(obj);
+
+            // iterate over user's stories and index them
+            for (Object story: arr) {
+
+                Integer currStory = Integer.parseInt( story.toString() );
+                String newUrl = "https://hacker-news.firebaseio.com/v0/item/" + currStory + ".json?print=pretty";
+
+                //DEBUG
+                System.out.println("Indexing " + username + "'s story: " + newUrl);
+
+                server.putURLClient(newUrl);
+
+            }
+
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        model.addAttribute("result_index", "Success");
+
+        return "index_hackernews";
+    }
+
+
+
 }
