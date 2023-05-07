@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>Stats</title>
     <link th:href="@{/style.css}" rel="stylesheet" />
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/sockjs-client/sockjs.min.js}"></script>
+    <script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
+    <script th:src="@{/admin_page.js}"></script>
 </head>
 <body>
 <div th:insert="~{navbar::navbar}"></div>
@@ -15,7 +19,7 @@
          <th>IP</th>
          <th>Available</th>
         </thead>
-        <tbody>
+        <tbody id="components">
         <tr th:each="item:${stats}">
             <td th:text="${item.key}"></td>
             <td th:text="${item.value.getIp()}"></td>
@@ -29,7 +33,7 @@
         <th>Numero Pesquisas</th>
         <th>Pesquisa</th>
         </thead>
-        <tbody>
+        <tbody id="searches">
         <tr th:each="searched:${searches}">
             <td th:text="${searched.getNumSearches().toString()}"></td>
             <td th:text="${searched.getTerm()}"></td>

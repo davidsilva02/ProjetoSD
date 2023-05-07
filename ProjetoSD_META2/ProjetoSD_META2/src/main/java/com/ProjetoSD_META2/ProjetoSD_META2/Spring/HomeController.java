@@ -5,6 +5,9 @@ import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 */
 import com.ProjetoSD_META2.ProjetoSD_META2.Component;
 import com.ProjetoSD_META2.ProjetoSD_META2.Searched;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,10 +39,6 @@ public class HomeController {
              e.printStackTrace();
              System.exit(0);
          }
-<<<<<<< HEAD
-
-=======
->>>>>>> 6ea004b781ec9f4fa7e7971b43b4be982faacdfb
 
     }
 
@@ -151,4 +150,10 @@ public class HomeController {
         return "admin_page";
     }
 
+    @MessageMapping("/update-stats")
+    @SendTo("/stats/messages")
+    public StatsMessage onUpdate(StatsMessage m){
+        System.out.println(m);
+        return  m;
+    }
 }

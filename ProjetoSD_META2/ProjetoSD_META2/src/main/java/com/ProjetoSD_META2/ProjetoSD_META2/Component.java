@@ -1,5 +1,8 @@
 package com.ProjetoSD_META2.ProjetoSD_META2;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.Serializable;
 
 /**
@@ -32,6 +35,12 @@ public class Component implements Serializable{
         this.isAvailable = isAvailable;
     }
 
-    
-    
+    @Override
+    public String toString() {
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

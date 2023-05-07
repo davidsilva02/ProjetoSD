@@ -1,5 +1,8 @@
 package com.ProjetoSD_META2.ProjetoSD_META2;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.Serializable;
 
 public class Searched implements Serializable {
@@ -33,4 +36,12 @@ public class Searched implements Serializable {
         return this.getTerm().equalsIgnoreCase(((Searched) obj).getTerm());
     }
 
+    @Override
+    public String toString() {
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
