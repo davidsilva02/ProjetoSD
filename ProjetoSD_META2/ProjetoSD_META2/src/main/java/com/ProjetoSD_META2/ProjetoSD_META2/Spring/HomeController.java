@@ -107,19 +107,57 @@ public class HomeController {
     @PostMapping("/search")
     public String searchTermo(@ModelAttribute InputSearch in, Model model, HttpSession s){
         if(in.getInp().equals("")) return "redirect:/";
+
         ArrayList<infoURL> urls = null;
+        int hash = -1;
+        int userId = 1; //TODO CHANGE
+
         try{
             urls = server.resultadoPesquisa(in.getInp(), 1);
+
+            if( urls.size() >= 11 && !urls.get(urls.size() - 1).getUrl().equals("fim")) {
+                // o hash do barrel foi guardado na variavel url de forma a ser mais facil
+                hash = Integer.parseInt(urls.get(urls.size() - 1).getUrl());
+            }
+
+
         }catch (RemoteException e){
             e.printStackTrace();
         }
 
         model.addAttribute("search",in.getInp());
+        model.addAttribute("results", Objects.requireNonNullElse(urls, new infoURL("No results found!","","")));
+        model.addAttribute("page",1);
+        model.addAttribute("barrelHash",hash);
+        model.addAttribute("userId",userId);
 
-//        ArrayList<infoURL> urls = new ArrayList<>();
-//        urls.add (new infoURL("url","title","citation"));
-//        urls.add (new infoURL("url1","title1","citation1"));
+        return "result_search";
+    }
 
+    @GetMapping("/search")
+    public String searchTermoPage(@RequestParam("search") String search, @RequestParam("page") int pageNum, @RequestParam("hash") String hash, @RequestParam("userId") int userId, Model model, HttpSession s){
+
+        ArrayList<infoURL> urls = null;
+
+        int newHash = Integer.parseInt(hash);
+
+        try{
+            urls = server.continueSearching(1, newHash);
+
+            if( urls.get(urls.size() - 1).getUrl().equals("fim") || urls.size() < 11) {
+                // atualizar o hash se nao existirem mais resultados
+                newHash = -1;
+            }
+
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
+
+        model.addAttribute("search",search);
+        model.addAttribute("page", pageNum+1);
+        model.addAttribute("barrelHash",newHash);
+        model.addAttribute("userId",userId);
         model.addAttribute("results", Objects.requireNonNullElse(urls, new infoURL("No results found!","","")));
 
         return "result_search";
@@ -266,11 +304,7 @@ public class HomeController {
     @GetMapping("/index-hackernews-stories")
     public String indexHackerNewsStories(@RequestParam("termos") String termosPesquisa, Model model) throws Exception {
 
-        System.out.println("HACKER NEWS");
-
-        //TODO ISTO TEM DE SER REVISTO DE ACORDO COMO AS COISAS VÊM PELO THYMELEAF E ASSIM, ESTÁ APENAS POR REPRESENTATIVIDADE
-/**/
-        System.out.println(termosPesquisa);
+        System.out.println("Searching HackerNews Top Stories. Searched Terms: " + termosPesquisa);
 
         String strTopStoriesId = null;
         try {
@@ -294,12 +328,8 @@ public class HomeController {
             //ir buscar a top story, verificar o texto e, se sim, indexar
 
             String url = "https://hacker-news.firebaseio.com/v0/item/" + storyId + ".json?print=pretty";
-//            System.out.println(url);
             JSONObject story = Request.getRequestJson(url);
 
-//            System.out.println(story);
-
-            //String texto = (String) story.get("text");
             //TODO COMO É QUE SE VAI BUSCAR O TEXTO???
             String texto = (String) story.get("title");
 
@@ -324,7 +354,7 @@ public class HomeController {
         return "index_hackernews";
     }
 
-@GetMapping("/index-hackernews-username-page")
+    @GetMapping("/index-hackernews-username-page")
     public String indexHackerRankUsernamePage(Model model){
         model.addAttribute("inptext",new InputText());
         return "index_hackernews_username_page";
@@ -349,10 +379,6 @@ public class HomeController {
             }
 
             JSONArray arr = (JSONArray) userdata.get("submitted");
-
-//            System.out.println("teste: ");
-//            for(Object obj: arr)
-//                System.out.println(obj);
 
             // iterate over user's stories and index them
             for (Object story: arr) {
@@ -380,6 +406,7 @@ public class HomeController {
 
         return "index_hackernews";
     }
+
 
 
 
