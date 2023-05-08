@@ -2,6 +2,8 @@ package com.ProjetoSD_META2.ProjetoSD_META2.Spring;
 
 import com.ProjetoSD_META2.ProjetoSD_META2.Component;
 import com.ProjetoSD_META2.ProjetoSD_META2.Searched;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
@@ -33,7 +35,7 @@ public class WebSocketClient {
             stompSession.send("/app/update-stats",new StatsMessage(components,searches));
             stompSession.disconnect();
             return true;
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException|IllegalStateException | MessageDeliveryException e) {
             return false;
         }
     }

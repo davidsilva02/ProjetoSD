@@ -12,7 +12,7 @@
   <div class="content">
   <h1 th:text="|References of ${search}|"/>
   <tr th:each="result: ${results}">
-    <div class="result-search-item">
+    <div class="result-search-item" th:if="${result.url!='fim' && result.title!=null}">
       <p th:text="|URL: ${result.url}|" />
       <p th:text="|TITLE: ${result.title}|" />
       <p th:text="|CITATION: ${result.citation}|"/>

@@ -37,7 +37,7 @@ button:hover{
 }
 
 .navbar button{
-    width: 150px;
+    width:auto;
 }
 
 .content{
@@ -66,13 +66,15 @@ table tr:hover {background-color: #ddd;}
 
 
 .result-search-item{
-    width: 500px;
+    width: 100%;
     height: auto;
     border: 2px solid black;
     border-radius: 25px;
     margin-bottom: 20px;
-    display: block;
     align-items: center;
+    margin-right: 10px;
+    margin-left: 10px;
+
 }
 
 .stats{
