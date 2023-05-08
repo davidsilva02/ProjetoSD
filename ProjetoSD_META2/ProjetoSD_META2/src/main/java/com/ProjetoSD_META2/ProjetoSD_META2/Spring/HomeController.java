@@ -64,10 +64,16 @@ class Request{
 
             JSONTokener tokener = new JSONTokener(reader);
 
-            if( tokener.nextValue().equals("null") )
-                return new JSONObject(tokener);
-            else
+//            System.out.println("tokener " + tokener.nextValue());
+
+
+            if( tokener.next() != '{' )
                 return null;
+            else {
+                tokener.back();
+//                System.out.println("tokener " + tokener.nextValue());
+                return new JSONObject(tokener);
+            }
         }
 
     }
@@ -288,9 +294,10 @@ public class HomeController {
             //ir buscar a top story, verificar o texto e, se sim, indexar
 
             String url = "https://hacker-news.firebaseio.com/v0/item/" + storyId + ".json?print=pretty";
+//            System.out.println(url);
             JSONObject story = Request.getRequestJson(url);
 
-            System.out.println(story.toString());
+//            System.out.println(story);
 
             //String texto = (String) story.get("text");
             //TODO COMO É QUE SE VAI BUSCAR O TEXTO???
@@ -353,11 +360,15 @@ public class HomeController {
                 Integer currStory = Integer.parseInt( story.toString() );
                 String newUrl = "https://hacker-news.firebaseio.com/v0/item/" + currStory + ".json?print=pretty";
 
-                //DEBUG
-                System.out.println("Indexing " + username + "'s story: " + newUrl);
+                //get story info
+                JSONObject storyInfo = Request.getRequestJson(url);
 
-                server.putURLClient(newUrl);
+                if(storyInfo != null) {
+                    //DEBUG
+                    System.out.println("Indexing " + username + "'s story: " + (String) storyInfo.get("url"));
 
+                    server.putURLClient( (String) storyInfo.get("url") );
+                }
             }
 
 
