@@ -144,7 +144,7 @@ public class HomeController {
         try{
             urls = server.continueSearching(1, newHash);
 
-            if( urls.get(urls.size() - 1).getUrl().equals("fim") || urls.size() < 11) {
+            if( urls.get(urls.size() - 1).getUrl().equals("fim")) {
                 // atualizar o hash se nao existirem mais resultados
                 newHash = -1;
             }
