@@ -302,7 +302,7 @@ public class HomeController {
         return "redirect:/";
     }
     @GetMapping("/index-hackernews-stories")
-    public String indexHackerNewsStories(@RequestParam("termos") String termosPesquisa, Model model) throws Exception {
+    public String indexHackerNewsStories(@RequestParam("termos") String termosPesquisa, Model model) {
 
         System.out.println("Searching HackerNews Top Stories. Searched Terms: " + termosPesquisa);
 
@@ -328,7 +328,12 @@ public class HomeController {
             //ir buscar a top story, verificar o texto e, se sim, indexar
 
             String url = "https://hacker-news.firebaseio.com/v0/item/" + storyId + ".json?print=pretty";
-            JSONObject story = Request.getRequestJson(url);
+            JSONObject story = null;
+            try {
+                story = Request.getRequestJson(url);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             //TODO COMO É QUE SE VAI BUSCAR O TEXTO???
             String texto = (String) story.get("title");
@@ -339,7 +344,11 @@ public class HomeController {
                 //DEBUG
                 System.out.println("Indexing story url: " + url);
 
-                server.putURLClient((String)story.get("url"));
+                try {
+                    server.putURLClient((String)story.get("url"));
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
 
                 indexed = true;
             }
