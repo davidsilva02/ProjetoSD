@@ -10,39 +10,56 @@
 
 <div th:insert="~{navbar::navbar}"></div>
 
+<div class="content">
+
+  <h1 th:text="|Results of '${search}'|"/>
     <button>
         <a th:href="@{'/index-hackernews-stories?termos='+${search}}"> Index HackerNews</a>
     </button>
-
     <form action="#" th:action="@{/index-hackernews-stories}" th:object="${inptext}" method="post">
-<!--        <button type="submit" value="Submit" th:field="${search}">-->
-<!--            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">-->
-<!--                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>-->
-<!--            </svg>-->
-<!--        </button>-->
+        <!--        <button type="submit" value="Submit" th:field="${search}">-->
+        <!--            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">-->
+        <!--                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>-->
+        <!--            </svg>-->
+        <!--        </button>-->
     </form>
-
-
-<div th:if="${barrelHash != -1}">
-    <button>
-        <a th:href="@{'/search?search=' + ${search} + '&page='+ ${page} +'&hash='+${barrelHash} + '&userId=' + ${userId} }" > Next Page</a>
-    </button>
+    <br>
+    <div class="navigation-page">
+    <button th:if="${page}!=1" th:onclick="clickPrevPage()">Prev Page</button>
+    <button th:if="${barrelHash != -1}" th:onclick="clickNextPage()"> Next Page</button>
 </div>
+    <br>
+<script th:inline="javascript">
+    let page=[[${page}]]
+    let search=[[${search}]]
+    let barrelHash=[[${barrelHash}]]
+    let userId=[[${userId}]]
 
 
+    function clickPrevPage(){
+        history.back();
+    }
 
-  <div class="content">
-  <h1 th:text="|Results of '${search}'|"/>
-  <tr th:each="result: ${results}">
-    <div class="result-search-item" th:if="${result.url!='fim' && result.title!=null}">
-      <p th:text="|URL: ${result.url}|" />
-      <p th:text="|TITLE: ${result.title}|" />
-      <p th:text="|CITATION: ${result.citation}|"/>
-      <br>
-    </div>
-  </tr>
+    function clickNextPage(){
+
+        if(navigation.canGoForward===false){
+            window.location.href=(`/search?search=${search}&page=${page}&hash=${barrelHash}&userId=${userId}`)
+        }
+        else {
+            window.history.forward();
+        }
+    }
+</script>
+      <tr th:each="result: ${results}">
+          <div class="result-search-item" th:if="${result.url!='fim' && result.url!='No results found!' && result.title!=null}">
+              <a th:href="${result}" th:text="|URL: ${result.url}|" />
+              <p th:text="|TITLE: ${result.title}|" />
+              <p th:text="|CITATION: ${result.citation}|"/>
+              <br>
+          </div>
+          <h1 th:if="result.url=='No results found!'" th:text="${result.url}"></h1>
+      </tr>
   </div>
-
 
 </body>
 </html>
