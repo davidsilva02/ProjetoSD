@@ -52,7 +52,7 @@
 </script>
       <tr th:each="result: ${results}">
           <div class="result-search-item" th:if="${result.url!='fim' && result.url!='No results found!' && result.title!=null}">
-              <a th:href="${result}" th:text="|URL: ${result.url}|" />
+              <a th:href="${result.url}" th:text="|URL: ${result.url}|" />
               <p th:text="|TITLE: ${result.title}|" />
               <p th:text="|CITATION: ${result.citation}|"/>
               <br>

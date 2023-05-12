@@ -35,7 +35,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     String barrelName;
     ConcurrentHashMap<String, HashSet<infoURL>> ind; // termo: LINKS QUE CONTÉM O TERMO
     ConcurrentHashMap<String, infoURL> urls; // fatherUrl: LISTA DE URLS QUE FAZEM REFERENCIA PARA O fatherUrl
-    ConcurrentHashMap<Integer, ArrayList<infoURL>> resultados_pesquisa;
+    ConcurrentHashMap<String, ArrayList<infoURL>> resultados_pesquisa;
     ReentrantLock lockFile;
     ReentrantLock lockFile1;
     Integer countIterations = 0;
@@ -454,7 +454,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     }
 
     @Override
-    synchronized public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa, Integer id_client) throws RemoteException {
+    synchronized public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa, String id_client) throws RemoteException {
 
         server.makeBarrelUnavailable(this.barrelName);
 
@@ -636,7 +636,7 @@ public class IndexStorageBarrels extends UnicastRemoteObject implements BarrelRM
     }
 
     @Override
-    synchronized public ArrayList<infoURL> continueSearch(Integer id_client) throws RemoteException {
+    synchronized public ArrayList<infoURL> continueSearch(String id_client) throws RemoteException {
         if (resultados_pesquisa.containsKey(id_client)) {
             ArrayList<infoURL> l = resultados_pesquisa.get(id_client);
             ArrayList<infoURL> res = new ArrayList<infoURL>(l.subList(0, Math.min(10, l.size())));

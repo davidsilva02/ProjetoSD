@@ -6,6 +6,7 @@ import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import com.ProjetoSD_META2.ProjetoSD_META2.Component;
@@ -24,12 +25,9 @@ import javax.servlet.http.HttpSession;
 import javax.websocket.Session;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
+import java.util.*;
 
 import java.rmi.*;
-import java.util.Objects;
 
 import java.io.*;
 import java.net.*;
@@ -110,10 +108,10 @@ public class HomeController {
 
         ArrayList<infoURL> urls = null;
         int hash = -1;
-        int userId = 1; //TODO CHANGE
+        String userId = UUID.randomUUID().toString();;
 
         try{
-            urls = server.resultadoPesquisa(in.getInp(), 1);
+            urls = server.resultadoPesquisa(in.getInp(), userId);
 
             if( urls.size() >= 11 && !urls.get(urls.size() - 1).getUrl().equals("fim")) {
                 // o hash do barrel foi guardado na variavel url de forma a ser mais facil
@@ -135,14 +133,14 @@ public class HomeController {
     }
 
     @GetMapping("/search")
-    public String searchTermoPage(@RequestParam("search") String search, @RequestParam("page") int pageNum, @RequestParam("hash") String hash, @RequestParam("userId") int userId, Model model, HttpSession s){
+    public String searchTermoPage(@RequestParam("search") String search, @RequestParam("page") int pageNum, @RequestParam("hash") String hash, @RequestParam("userId") String userId, Model model, HttpSession s){
 
         ArrayList<infoURL> urls = null;
 
         int newHash = Integer.parseInt(hash);
 
         try{
-            urls = server.continueSearching(1, newHash);
+            urls = server.continueSearching(userId, newHash);
 
             if( urls.get(urls.size() - 1).getUrl().equals("fim")) {
                 // atualizar o hash se nao existirem mais resultados
@@ -388,6 +386,7 @@ public class HomeController {
             }
 
             JSONArray arr = (JSONArray) userdata.get("submitted");
+            System.out.println(arr);
 
             // iterate over user's stories and index them
             for (Object story: arr) {
@@ -396,19 +395,24 @@ public class HomeController {
                 String newUrl = "https://hacker-news.firebaseio.com/v0/item/" + currStory + ".json?print=pretty";
 
                 //get story info
-                JSONObject storyInfo = Request.getRequestJson(url);
+                JSONObject storyInfo = Request.getRequestJson(newUrl);
 
                 if(storyInfo != null) {
                     //DEBUG
+                    try{
                     System.out.println("Indexing " + username + "'s story: " + (String) storyInfo.get("url"));
-
                     server.putURLClient( (String) storyInfo.get("url") );
+                    }
+                    catch (JSONException|RemoteException e){
+                        e.printStackTrace();
+                    }
                 }
             }
 
 
+
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         model.addAttribute("result_index", "Success");

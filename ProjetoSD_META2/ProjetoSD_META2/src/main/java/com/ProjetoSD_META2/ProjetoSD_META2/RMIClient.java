@@ -77,7 +77,7 @@ public class RMIClient {
                     input = sc.nextLine();
                     while (!flagWorked) {
                         try {
-                            ArrayList<infoURL> result = server.resultadoPesquisa(input, this.hashCode());
+                            ArrayList<infoURL> result = server.resultadoPesquisa(input, Integer.toString(this.hashCode()));
                             int num_pagina = 1;
                             if (result != null) {
                                 // se o tamanho for igual a 10, não há mais resultados
@@ -114,7 +114,7 @@ public class RMIClient {
                                         }
 
                                         if (option_pages.equals("n")) {
-                                            result = server.continueSearching(this.hashCode(), hash_barrel);
+                                            result = server.continueSearching(Integer.toString(this.hashCode()), hash_barrel);
                                         }
 
                                         if (option_pages.equals("q"))

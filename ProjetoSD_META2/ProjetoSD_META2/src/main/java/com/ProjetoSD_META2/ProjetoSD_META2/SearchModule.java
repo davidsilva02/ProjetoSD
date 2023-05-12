@@ -113,7 +113,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     }
 
     @Override
-    synchronized public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa, Integer id_client)
+    synchronized public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa, String id_client)
             throws RemoteException {
         System.out.printf("Client pesquisou %s \n", termo_pesquisa);
 
@@ -162,7 +162,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
      * @return List<infoURL> if everything is OK, null if there was no result or no
      *         available barrels
      */
-    synchronized public ArrayList<infoURL> pesquisa_barrel(String termo_pesquisa, Integer id_client) {
+    synchronized public ArrayList<infoURL> pesquisa_barrel(String termo_pesquisa, String id_client) {
         ArrayList<infoURL> result = null;
         boolean hasValid = false;
         BarrelRMI barrel_a_procurar = null;
@@ -403,12 +403,12 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     }
 
     @Override
-    synchronized public ArrayList<infoURL> continueSearching(Integer id_client, Integer hash_barrel)
+    synchronized public ArrayList<infoURL> continueSearching(String id_client, Integer hash_barrel)
             throws RemoteException {
         return cSearching(id_client, hash_barrel);
     }
 
-    synchronized public ArrayList<infoURL> cSearching(Integer id_client, Integer hash_barrel) {
+    synchronized public ArrayList<infoURL> cSearching(String id_client, Integer hash_barrel) {
 
         ArrayList<infoURL> result = null;
         BarrelRMI barrel_a_procurar = null;

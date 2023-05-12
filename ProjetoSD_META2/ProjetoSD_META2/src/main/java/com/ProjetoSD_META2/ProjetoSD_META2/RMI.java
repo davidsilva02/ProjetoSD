@@ -22,7 +22,7 @@ public interface RMI extends Remote {
 
     public String makeLogin(String username, String pw) throws RemoteException;
 
-    public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa, Integer id_client)
+    public ArrayList<infoURL> resultadoPesquisa(String termo_pesquisa, String id_client)
             throws java.rmi.RemoteException;
 
     public ArrayList<infoURL> getReferencesList(String url) throws RemoteException;
@@ -47,5 +47,5 @@ public interface RMI extends Remote {
 
     public void updateBarrels(HashSet<Integer> hashs) throws RemoteException;
 
-    public ArrayList<infoURL> continueSearching(Integer id_client, Integer hash_barrel) throws RemoteException;
+    public ArrayList<infoURL> continueSearching(String id_client, Integer hash_barrel) throws RemoteException;
 }
