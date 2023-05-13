@@ -165,20 +165,20 @@ public class HomeController {
     public String indexarUrl( @ModelAttribute InputText in, Model model){
 
 
-         String result;
-         try {
-             server.putURLClient(in.getInp());
-             result = "URL indexada com sucesso";
-         } catch (RemoteException e) {
-             e.printStackTrace();
-             result = "Erro ao indexar URL";
-         }
-
         // System.out.println(in.getInp() + " " + result);
         model.addAttribute("inptext",new InputText());
 
         //se o url for indexado
         model.addAttribute("result","URL " + in.getInp() + " indexed!");
+
+        String result;
+        try {
+            server.putURLClient(in.getInp());
+            result = "URL indexada com sucesso";
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            result = "Erro ao indexar URL";
+        }
 
         return "index_url";
     }
@@ -397,11 +397,17 @@ public class HomeController {
                 //get story info
                 JSONObject storyInfo = Request.getRequestJson(newUrl);
 
+
                 if(storyInfo != null) {
+
+                    System.out.println("storyInfo: " + storyInfo + " : "+ newUrl);
+
                     //DEBUG
                     try{
-                    System.out.println("Indexing " + username + "'s story: " + (String) storyInfo.get("url"));
-                    server.putURLClient( (String) storyInfo.get("url") );
+                        if( ((String)storyInfo.get("type")).equals("story") ) {
+                            System.out.println("Indexing " + username + "'s story: " + (String) storyInfo.get("url"));
+                            server.putURLClient((String) storyInfo.get("url"));
+                        }
                     }
                     catch (JSONException|RemoteException e){
                         e.printStackTrace();
