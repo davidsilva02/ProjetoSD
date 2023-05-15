@@ -1,0 +1,8 @@
+<configuration>
+    <logger name="org.springframework.web.socket.sockjs.client.WebSocketClientSockJsSession" level="OFF" />
+    <logger name="org.springframework.web.socket.handler.LoggingWebSocketHandlerDecorator" level="OFF" />
+    <logger name="org.springframework.messaging.simp.stomp.DefaultStompSession" level="OFF" />
+    <logger name="org.springframework.web.socket.sockjs.client.WebSocketClientSockJsSession" level="OFF" />
+    <logger name="org.springframework.web.socket.adapter.NativeWebSocketSession" level="OFF" />
+    <logger name="org.springframework.web.socket.handler.LoggingWebSocketHandlerDecorator" level="OFF" />
+</configuration>

@@ -247,7 +247,8 @@ public class HomeController {
     @MessageMapping("/update-stats")
     @SendTo("/stats/messages")
     public StatsMessage onUpdate(StatsMessage m){
-        System.out.println(m);
+        //System.out.println(m);
+        System.out.println("UPDATE STATS!");
         return  m;
     }
 
