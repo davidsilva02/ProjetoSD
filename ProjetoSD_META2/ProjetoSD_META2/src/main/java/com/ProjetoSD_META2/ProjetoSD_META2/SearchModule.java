@@ -1,11 +1,7 @@
 package com.ProjetoSD_META2.ProjetoSD_META2;
 
-import com.ProjetoSD_META2.ProjetoSD_META2.Spring.WebSocketClient;
-
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.ServerNotActiveException;
@@ -27,6 +23,8 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
     ReentrantLock lockFile1;
     ReentrantLock lockFile2;
+
+    WebSocketClient wsc;
 
     public SearchModule() throws RemoteException {
         super();
@@ -75,6 +73,8 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
         lockFile1 = new ReentrantLock();
         lockFile2 = new ReentrantLock();
 
+        wsc=new WebSocketClient();
+
     }
 
     public static void main(String[] args) {
@@ -102,7 +102,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
             }
         }
 
-        new WebSocketClient().sendMessage(system,new ArrayList<>(searches));
+        wsc.sendMessage(system,new ArrayList<>(searches));
 
         // Get reference for the Downloader RMI
         this.dwRMI = ref;
@@ -140,7 +140,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
 
         System.out.println(topSearches);
 
-        new WebSocketClient().sendMessage(system, topSearches);
+        wsc.sendMessage(system, topSearches);
 
         new Thread(() -> {
 
@@ -260,7 +260,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
             e.printStackTrace();
         }
 
-        new WebSocketClient().sendMessage(system,new ArrayList<>(searches));
+        wsc.sendMessage(system,new ArrayList<>(searches));
 
         System.out.println("Downloader disponivel:" + threadName);
     }
@@ -268,14 +268,14 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
     @Override
     public void makeDownloaderAvailable(String threadName) throws RemoteException {
         system.replace(threadName, new Component(system.get(threadName).getIp(), true));
-        new WebSocketClient().sendMessage(system,new ArrayList<>(searches));
+        wsc.sendMessage(system,new ArrayList<>(searches));
 
     }
 
     @Override
     public void makeDownloaderUnavailable(String threadName) throws RemoteException {
         system.replace(threadName, new Component(system.get(threadName).getIp(), false));
-        new WebSocketClient().sendMessage(system,new ArrayList<>(searches));
+        wsc.sendMessage(system,new ArrayList<>(searches));
 
     }
 
@@ -300,20 +300,20 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
                 System.out.println("Ainda nao existe um downloader");
             }
         }
-        new WebSocketClient().sendMessage(system,new ArrayList<>(searches));
+        wsc.sendMessage(system,new ArrayList<>(searches));
 
         System.out.println("Barrel disponivel:" + b.hashCode());
     }
 
     public void makeBarrelUnavailable(String name) throws RemoteException {
         system.replace(name, new Component(system.get(name).getIp(), false));
-        new WebSocketClient().sendMessage(system,new ArrayList<>(searches));
+        wsc.sendMessage(system,new ArrayList<>(searches));
 
     }
 
     public void makeBarrelAvailable(String name) throws RemoteException {
         system.replace(name, new Component(system.get(name).getIp(), true));
-        new WebSocketClient().sendMessage(system,new ArrayList<>(searches));
+        wsc.sendMessage(system,new ArrayList<>(searches));
 
     }
 
@@ -332,7 +332,7 @@ public class SearchModule extends UnicastRemoteObject implements RMI {
                 System.out.println("Ainda nao existe um downloader");
             }
         }
-        new WebSocketClient().sendMessage(system,new ArrayList<>(searches));
+        wsc.sendMessage(system,new ArrayList<>(searches));
 
         System.out.println("Barrel indisponivel:" + b.hashCode());
     }

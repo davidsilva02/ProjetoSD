@@ -1,7 +1,8 @@
-package com.ProjetoSD_META2.ProjetoSD_META2.Spring;
+package com.ProjetoSD_META2.ProjetoSD_META2;
 
 import com.ProjetoSD_META2.ProjetoSD_META2.Component;
 import com.ProjetoSD_META2.ProjetoSD_META2.Searched;
+import com.ProjetoSD_META2.ProjetoSD_META2.Spring.StatsMessage;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -21,15 +22,13 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class WebSocketClient {
+    List<Transport> transports;
+    SockJsClient sockJsClient;
+    WebSocketStompClient stompClient;
+    StompSessionHandler sessionHandler;
+
     public boolean sendMessage (HashMap<String, Component> components, List<Searched> searches){
         try {
-            List<Transport> transports = new ArrayList<>();
-            transports.add(new WebSocketTransport(new StandardWebSocketClient()));
-            SockJsClient sockJsClient = new SockJsClient(transports);
-            WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
-            stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-            stompClient.setTaskScheduler(new ConcurrentTaskScheduler());
-            StompSessionHandler sessionHandler = new MyStompSessionHandler();
             StompSession stompSession = null;
             stompSession = stompClient.connect("ws://localhost:8080/stats-websocket", sessionHandler).get();
             stompSession.send("/app/update-stats",new StatsMessage(components,searches));
@@ -61,6 +60,13 @@ public class WebSocketClient {
     }
 
     public WebSocketClient(){
+        transports = new ArrayList<>();
+        transports.add(new WebSocketTransport(new StandardWebSocketClient()));
+        sockJsClient = new SockJsClient(transports);
+        stompClient = new WebSocketStompClient(sockJsClient);
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+        stompClient.setTaskScheduler(new ConcurrentTaskScheduler());
+        sessionHandler = new MyStompSessionHandler();
     }
 
 
