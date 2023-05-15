@@ -372,6 +372,8 @@ public class HomeController {
 
         String username = in.getInp();
         String url = "https://hacker-news.firebaseio.com/v0/user/" + username + ".json?print=pretty";
+        Integer indexed = 0;
+        boolean flagErrors = false;
 
         //DEBUG
         System.out.println("Indexing " + username + "'s stories...");
@@ -406,10 +408,14 @@ public class HomeController {
                     try{
                         if( ((String)storyInfo.get("type")).equals("story") ) {
                             System.out.println("Indexing " + username + "'s story: " + (String) storyInfo.get("url"));
+                            System.out.println("Indexing2 " + username + "'s story: " + (String) storyInfo.get("url"));
+
                             server.putURLClient((String) storyInfo.get("url"));
+                            indexed++;
                         }
                     }
-                    catch (JSONException|RemoteException e){
+                    catch (Exception e){
+                        flagErrors = true;
                         e.printStackTrace();
                     }
                 }
@@ -418,10 +424,20 @@ public class HomeController {
 
 
         } catch (Exception e) {
+            flagErrors = true;
             e.printStackTrace();
         }
 
-        model.addAttribute("result_index", "Success");
+
+        if( flagErrors  && indexed > 0)
+            //ocorram erros e não foram indexadas nenhumas stories
+            model.addAttribute("result_index", String.format("Error: Some type of error occured but %d stories were indexed",indexed));
+
+        else if(flagErrors && indexed == 0)
+            model.addAttribute("result_index", "Error: No stories indexed");
+
+        else
+            model.addAttribute("result_index", String.format("Success! %d stories indexed",indexed));
 
         return "index_hackernews";
     }
