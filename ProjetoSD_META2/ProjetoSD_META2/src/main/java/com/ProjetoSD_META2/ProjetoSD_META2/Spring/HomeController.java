@@ -164,14 +164,24 @@ public class HomeController {
         //se o url for indexado
         model.addAttribute("result","URL " + in.getInp() + " indexed!");
 
-        String result;
+        String result = "";
         try {
-            server.putURLClient(in.getInp());
-            result = "URL indexada com sucesso";
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            result = "Erro ao indexar URL";
+            new URL(in.getInp());
+        } catch (MalformedURLException e) {
+            result= String.format("%s is not url!",in.getInp());
         }
+        if(result.equals("")){
+            try {
+                server.putURLClient(in.getInp());
+                result = "URL indexada com sucesso";
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                result = "Erro ao indexar URL";
+            }
+        }
+
+        //se o url for indexado
+        model.addAttribute("result",result);
 
         return "index_url";
     }
