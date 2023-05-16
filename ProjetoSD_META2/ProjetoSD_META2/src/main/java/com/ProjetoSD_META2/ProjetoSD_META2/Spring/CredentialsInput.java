@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginInput {
+public class CredentialsInput {
     private String user;
     private String password;
 }

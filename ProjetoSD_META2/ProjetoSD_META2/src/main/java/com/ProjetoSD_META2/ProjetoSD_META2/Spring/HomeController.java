@@ -6,14 +6,10 @@ import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import com.ProjetoSD_META2.ProjetoSD_META2.Component;
 import com.ProjetoSD_META2.ProjetoSD_META2.Searched;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +18,9 @@ import com.ProjetoSD_META2.ProjetoSD_META2.RMI;
 import com.ProjetoSD_META2.ProjetoSD_META2.infoURL;
 
 import javax.servlet.http.HttpSession;
-import javax.websocket.Session;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.*;
-
-import java.rmi.*;
 
 import java.io.*;
 import java.net.*;
@@ -86,7 +79,7 @@ public class HomeController {
 
     public HomeController() {
 
-         System.out.println("A iniciar a conexao RMI ao Search Module");
+         System.out.println("HomeController - A iniciar a conexao RMI ao Search Module");
          try {
              this.server = (RMI) Naming.lookup("rmi://localhost:3366/server");
          } catch (Exception e) {
@@ -103,7 +96,7 @@ public class HomeController {
     }
 
     @PostMapping("/search")
-    public String searchTermo(@ModelAttribute InputSearch in, Model model, HttpSession s){
+    public String searchTermo(@ModelAttribute InputText in, Model model, HttpSession s){
         if(in.getInp().equals("")) return "redirect:/";
 
         ArrayList<infoURL> urls = null;
@@ -244,62 +237,7 @@ public class HomeController {
         return "admin_page";
     }
 
-    @MessageMapping("/update-stats")
-    @SendTo("/stats/messages")
-    public StatsMessage onUpdate(StatsMessage m){
-        //System.out.println(m);
-        System.out.println("UPDATE STATS!");
-        return  m;
-    }
 
-    @GetMapping("/login")
-    public String login(Model model){
-        model.addAttribute("loginInput",new LoginInput());
-        return "login";
-    }
-
-    @GetMapping("/register")
-    public String register (Model model){
-        model.addAttribute("loginInput",new LoginInput());
-        return "register";
-    }
-
-    @PostMapping("/make-login")
-    public String makeLogin(@ModelAttribute LoginInput login, HttpSession s,Model model){
-        System.out.println(login);
-        String user=null;
-        try {
-            user=server.makeLogin(login.getUser(),login.getPassword());
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-
-        if(user==null) model.addAttribute("result","USER AND PASSWORD NOT FOUND!");
-        if(user!=null) model.addAttribute("result",String.format("WELCOME, @%s",user));
-        s.setAttribute("token",user);
-        return "result";
-    }
-    @PostMapping("/make-register")
-    public String makeRegister(@ModelAttribute LoginInput login, HttpSession s){
-        System.out.println(login);
-
-        //register user and password
-        try {
-            server.makeRegister(login.getUser(),login.getPassword());
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-
-
-        return "redirect:/login";
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession s){
-        //remove token
-        s.removeAttribute("token");
-        return "redirect:/";
-    }
     @GetMapping("/index-hackernews-stories")
     public String indexHackerNewsStories(@RequestParam("termos") String termosPesquisa, Model model) {
 
